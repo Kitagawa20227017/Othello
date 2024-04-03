@@ -14,13 +14,13 @@ public class MyScript2 : MonoBehaviour
 
     #region 変数  
 
-    [SerializeField]
+    [SerializeField,Header("SurfacePlateオブジェクト")]
     private GameObject _surfacePlate = default;
 
-    [SerializeField]
+    [SerializeField, Header("GameManegerオブジェクト")]
     private GameObject _gameManeger = default;
 
-    [SerializeField]
+    [SerializeField,Header("Stonesオブジェクト")]
     private Transform _stones = default;
 
     private GameObject[,] _putStones = new GameObject[8, 8];
