@@ -48,7 +48,7 @@ public class PlayerInput : MonoBehaviour
     /// </summary>  
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if ( Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit = new RaycastHit();

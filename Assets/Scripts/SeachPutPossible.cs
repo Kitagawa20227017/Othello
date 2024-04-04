@@ -70,6 +70,16 @@ public class SeachPutPossible : MonoBehaviour
         get => _blackSurfacePlate;
     }
 
+    public int BlackCount
+    {
+        get => _blackStoneConut;
+    }
+
+    public int WhiteCount
+    {
+        get => _whiteStoneConut;
+    }
+
     public int[,] White 
     {
         get => _whiteSurfacePlate;
