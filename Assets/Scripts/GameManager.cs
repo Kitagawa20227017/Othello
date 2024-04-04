@@ -17,10 +17,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject _putStone = default;
 
+
     private SeachPutPossible _seachPutPossible = default;
     private MyScript2 _myScript = default;
 
     private bool _isTurn = false;
+    private bool _isPlayerTurn = false;
 
     #endregion
 
@@ -31,22 +33,37 @@ public class GameManager : MonoBehaviour
         get => _isTurn; 
     }
 
+    public bool IsPlayerTurn
+    {
+        get => _isPlayerTurn;
+    }
+
     #endregion
 
     #region メソッド  
-     
+
     /// <summary>  
-    /// 更新前処理  
-    /// </summary>  
-    private void Start ()
+    /// 初期化処理  
+    /// </summary> 
+    private void Awake()
     {
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
         _myScript = _putStone.GetComponent<MyScript2>();
+        int preceding = Random.Range(0, 2);
+        if (preceding == 0)
+        {
+            _isPlayerTurn = false;
+        }
+        else if (preceding == 1)
+        {
+            _isPlayerTurn = true;
+        } 
     }
 
     public void aa()
     {
         _isTurn = !_isTurn;
+        _isPlayerTurn = !_isPlayerTurn;
         _seachPutPossible.Seach();
         if (!IsTurn)
         {
@@ -56,11 +73,23 @@ public class GameManager : MonoBehaviour
         {
             _myScript.BlackPutStone();
         }
+
+        if(_isPlayerTurn)
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     public void nnnn(string s)
     {
-        Debug.Log(s);
+        foreach(Transform chlid in _putStone.transform)
+        {
+            chlid.gameObject.SetActive(false);
+        }
     }
 
     #endregion
