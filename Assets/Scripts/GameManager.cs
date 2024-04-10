@@ -86,6 +86,7 @@ public class GameManager : MonoBehaviour
 
     public void nnnn(string s)
     {
+        Debug.Log(s);
         foreach(Transform chlid in _putStone.transform)
         {
             chlid.gameObject.SetActive(false);
