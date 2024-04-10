@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MyScript : MonoBehaviour
+public class MiniMaxAI : MonoBehaviour
 {
 
     #region 変数  
@@ -26,8 +26,11 @@ public class MyScript : MonoBehaviour
     private GameManager _gameManagerScript = default;
     private SeachPutPossible _seachPutPossible = default;
     private MyScript2 _myScript = default;
+    private AITurnOver _myScript3 = default;
     private bool _isWhite = false;
-    private int[,] _copy = new int[8, 8];
+    private int[,] _mapCopy = new int[8, 8];
+    private int[,] _myPutStone = new int[8, 8];
+    private int _myColer = 0;
 
     #endregion
 
@@ -51,13 +54,16 @@ public class MyScript : MonoBehaviour
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
         _myScript = _putStone.GetComponent<MyScript2>();
         _gameManagerScript = _gameManager.GetComponent<GameManager>();
+        _myScript3 = this.gameObject.GetComponent<AITurnOver>();
         if (_gameManagerScript.IsPlayerTurn == false)
         {
             _isWhite = true;
+            _myColer = 1;
         }
         else
         {
             _isWhite = false;
+            _myColer = -1;
         }
     }
 
@@ -68,11 +74,11 @@ public class MyScript : MonoBehaviour
     {
         if (_gameManagerScript.IsPlayerTurn == false)
         {
-            for(int i = 0; i < _copy.GetLength(0); i++)
+            for(int i = 0; i < _mapCopy.GetLength(0); i++)
             {
-                for(int j = 0; j < _copy.GetLength(1); j++)
+                for(int j = 0; j < _mapCopy.GetLength(1); j++)
                 {
-                    _copy[i, j] = _seachPutPossible.Map[i, j];
+                    _mapCopy[i, j] = _seachPutPossible.Map[i, j];
                 }
             }
             RandomAI();
@@ -81,14 +87,20 @@ public class MyScript : MonoBehaviour
 
     public void RandomAI()
     {
-        int putStoneConut = 0;
+        int score = 0;
+        int maxScore = -10000;
+        int x = 0;
+        int z = 0;
+        int myPutConut = 0;
+        bool flag = false;
         if (!_isWhite)
         {
             for (int i = 0; i < _seachPutPossible.Black.GetLength(0); i++)
             {
                 for (int j = 0; j < _seachPutPossible.Black.GetLength(1); j++)
                 {
-                   
+                    _myPutStone[i, j] = _seachPutPossible.Black[i, j];
+                    myPutConut = _seachPutPossible.BlackCount;
                 }
             }
         }
@@ -98,23 +110,39 @@ public class MyScript : MonoBehaviour
             {
                 for (int j = 0; j < _seachPutPossible.White.GetLength(1); j++)
                 {
-                   
+                    _myPutStone[i, j] = _seachPutPossible.White[i, j];
+                    myPutConut = _seachPutPossible.WhiteCount;
                 }
             }
         }
 
-        for (int i = 0; i < _copy.GetLength(0); i++)
+        if(myPutConut == 0)
         {
-            for (int j = 0; j < _copy.GetLength(0); j++)
+            return;
+        }
+
+        for (int i = 0; i < _myPutStone.GetLength(0); i++)
+        {
+            for (int j = 0; j < _myPutStone.GetLength(0); j++)
             {
-                if (_copy[i, j] == 1)
+                if (_myPutStone[i, j] == 1)
                 {
-                    putStoneConut++;
+                    score = _myScript3.TurnOver(_mapCopy,i,j,_myColer, _myColer, 0);
+                    flag = true;
                 }
 
-                
+                if (flag && score > maxScore)
+                {
+                    maxScore = score;
+                    x = i;
+                    z = j;
+                }
+                flag = false;
             }
         }
+
+        _myScript.aaa(x, z);
+        return;
 
     }
 

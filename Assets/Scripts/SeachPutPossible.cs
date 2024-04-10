@@ -35,12 +35,16 @@ public class SeachPutPossible : MonoBehaviour
     [SerializeField,Header("GameManagerオブジェクト")]
     private GameObject _gameManager = default;
 
+    [SerializeField]
+    private GameObject _putStone = default;
+
     // GameManagerスクリプト格納用
     private GameManager _gameManagerScript = default;
 
     // Transform取得用
     private Transform _parentTransform = default;
-    
+    private Transform _putStoneTransform = default;
+
     // 盤面情報
     private int[,] _surfacePlate = new int[8, 8];
 
@@ -96,6 +100,7 @@ public class SeachPutPossible : MonoBehaviour
     {
         // 初期設定
         _parentTransform = this.transform;
+        _putStoneTransform = _putStone.transform;
         _gameManagerScript = _gameManager.GetComponent<GameManager>();
         Seach();
     }
@@ -121,12 +126,18 @@ public class SeachPutPossible : MonoBehaviour
                 }
 
             }
+
+            foreach(Transform chlid in _putStoneTransform)
+            {
+                chlid.gameObject.SetActive(false);
+            }
+
             string s = default;
             if (_blackStoneSum > _whiteStoneSum)
             {
                 s = "黒勝ち";
             }
-            else if (_blackStoneSum > _whiteStoneSum)
+            else if (_blackStoneSum < _whiteStoneSum)
             {
                 s = "白勝ち";
             }
