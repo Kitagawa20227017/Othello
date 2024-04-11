@@ -42,13 +42,17 @@ public class MyScript4 : MonoBehaviour
                     score = _myScript.TurnOver(n, i, j, myStoneColer, turnStoneColer, conut);
                 }
 
-                if(score > maxScore)
+                if(myStoneColer == turnStoneColer && score > maxScore)
+                {
+                    maxScore = score;
+                }
+                else if (myStoneColer != turnStoneColer && score < maxScore)
                 {
                     maxScore = score;
                 }
             }
         }
-        return score;
+        return maxScore;
     }
 
 

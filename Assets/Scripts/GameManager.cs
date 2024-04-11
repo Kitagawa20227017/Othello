@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
 
     private bool _isTurn = false;
     private bool _isPlayerTurn = false;
+    private bool isFin = false;
 
     #endregion
 
@@ -62,6 +63,10 @@ public class GameManager : MonoBehaviour
 
     public void aa()
     {
+        if(isFin)
+        {
+            return;
+        }
         _isTurn = !_isTurn;
         _isPlayerTurn = !_isPlayerTurn;
         _seachPutPossible.Seach();
@@ -73,19 +78,11 @@ public class GameManager : MonoBehaviour
         {
             _myScript.BlackPutStone();
         }
-
-        if(_isPlayerTurn)
-        {
-
-        }
-        else
-        {
-
-        }
     }
 
     public void nnnn(string s)
     {
+        isFin = true;
         Debug.Log(s);
         foreach(Transform chlid in _putStone.transform)
         {

@@ -29,7 +29,7 @@ public class AITurnOver : MonoBehaviour
         { 30,-12,  0, -1, -1,  0, -12,  30},
     };
 
-    private AISeach _myScript = default;
+    private AISeach _AISeach = default;
 
     #endregion
 
@@ -40,13 +40,15 @@ public class AITurnOver : MonoBehaviour
     /// </summary>  
     private void Start ()
     {
-        _myScript = this.gameObject.GetComponent<AISeach>();
+        _AISeach = this.gameObject.GetComponent<AISeach>();
     }
 
     public int TurnOver(int[,] n, int x, int z, int myStoneColer,int turnStoneColer, int conut)
     {
-
+        // コピー用の配列生成
         int[,] copy = new int[8, 8];
+
+        // 現在の盤面をコピー
         for (int i = 0; i < n.GetLength(0); i++)
         {
             for (int j = 0; j < n.GetLength(1); j++)
@@ -55,7 +57,9 @@ public class AITurnOver : MonoBehaviour
             }
         }
         
+        // 手数を増やす
         conut++;
+
         // 現在のマスが範囲内で右隣に石があるとき
         if (z != n.GetLength(1) - 1 && n[x, z + 1] != turnStoneColer && n[x, z + 1] != 0)
         {
@@ -108,7 +112,7 @@ public class AITurnOver : MonoBehaviour
 
         if (conut < _depth)
         {
-            return _myScript.Seach(n, myStoneColer, -turnStoneColer,conut);
+            return _AISeach.Seach(n, myStoneColer, -turnStoneColer,conut);
         }
         else
         {

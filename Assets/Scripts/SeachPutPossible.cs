@@ -60,10 +60,16 @@ public class SeachPutPossible : MonoBehaviour
     private int _whiteStoneSum = 0;
     private int _blackStoneSum = 0;
 
+    private bool isFin = false;
+
     #endregion
 
     #region プロパティ  
 
+    public bool IsFin
+    {
+        get => isFin;
+    }
     public int[,] Map
     {
         get => _surfacePlate;
@@ -110,6 +116,11 @@ public class SeachPutPossible : MonoBehaviour
     /// </summary>
     public void Seach()
     {
+        if (isFin)
+        {
+            return;
+        }
+
         // 石が盤面全てに埋まっていたら終了
         if (_parentTransform.childCount >= STONE_MAX_SUM)
         {
@@ -146,6 +157,7 @@ public class SeachPutPossible : MonoBehaviour
                 s = "引き分け";
             }
             _gameManagerScript.nnnn(s);
+            isFin = true;
             return;
         }
 
@@ -270,11 +282,13 @@ public class SeachPutPossible : MonoBehaviour
         if (_whiteStoneConut == 0 && !_gameManagerScript.IsTurn)
         {
             _gameManagerScript.aa();
+            return;
         }
         // 黒の置ける場所がないかつ黒のターンのとき
         else if (_blackStoneConut == 0 && _gameManagerScript.IsTurn)
         {
             _gameManagerScript.aa();
+            return;
         }
     }
 
@@ -317,7 +331,7 @@ public class SeachPutPossible : MonoBehaviour
         int coler = _surfacePlate[x, z - 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = z - 2; i > 0; i--)
+        for (int i = z - 2; i >= 0; i--)
         {
             // 何もなかったとき
             if (_surfacePlate[x, i] == 0)
@@ -373,7 +387,7 @@ public class SeachPutPossible : MonoBehaviour
         int coler = _surfacePlate[x - 1, z];
 
         // 色を見た隣の色を見ていく
-        for (int i = x - 2; i > 0; i++)
+        for (int i = x - 2; i >= 0; i++)
         {
             // 何もなかったとき
             if (_surfacePlate[i, z] == 0)
