@@ -19,14 +19,20 @@ public class GameManager : MonoBehaviour
 
 
     private SeachPutPossible _seachPutPossible = default;
-    private MyScript2 _myScript = default;
+    private StoneControl _myScript = default;
 
     private bool _isTurn = false;
     private bool _isPlayerTurn = false;
+    private bool isFin = false;
 
     #endregion
 
     #region プロパティ  
+
+    public bool IsFin
+    {
+        get => isFin;
+    }
 
     public bool IsTurn 
     {
@@ -48,8 +54,9 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
-        _myScript = _putStone.GetComponent<MyScript2>();
+        _myScript = _putStone.GetComponent<StoneControl>();
         int preceding = Random.Range(0, 2);
+        //preceding = 0;
         if (preceding == 0)
         {
             _isPlayerTurn = false;
@@ -62,6 +69,10 @@ public class GameManager : MonoBehaviour
 
     public void aa()
     {
+        if(isFin)
+        {
+            return;
+        }
         _isTurn = !_isTurn;
         _isPlayerTurn = !_isPlayerTurn;
         _seachPutPossible.Seach();
@@ -73,19 +84,11 @@ public class GameManager : MonoBehaviour
         {
             _myScript.BlackPutStone();
         }
-
-        if(_isPlayerTurn)
-        {
-
-        }
-        else
-        {
-
-        }
     }
 
     public void nnnn(string s)
     {
+        isFin = true;
         Debug.Log(s);
         foreach(Transform chlid in _putStone.transform)
         {

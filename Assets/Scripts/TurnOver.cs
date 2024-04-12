@@ -192,7 +192,7 @@ public class TurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = z - 2; i > 0; i--)
+        for (int i = z - 2; i >= 0; i--)
         {
             // 何もなかったとき
             if (_seachPutPossible.Map[x,i] == 0)
@@ -228,9 +228,8 @@ public class TurnOver : MonoBehaviour
     private void Seach4(int x, int z, int coler)
     {
         int a = default;
-
         // 隣の色を見ていく
-        for (int i = x - 2; i > 0; i--)
+        for (int i = x - 2; i >= 0; i--)
         {
             // 何もなかったとき
             if (_seachPutPossible.Map[i, z] == 0)
