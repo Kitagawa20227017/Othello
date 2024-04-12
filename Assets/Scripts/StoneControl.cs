@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class MyScript2 : MonoBehaviour
+public class StoneControl : MonoBehaviour
 {
 
     #region 変数  

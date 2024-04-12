@@ -1,22 +1,44 @@
 // ---------------------------------------------------------  
-// MyScript3.cs  
+// AITurnOver.cs  
 // 
+// 石を裏返し評価を求める処理
+// １つ下の階層を見るときはAISeach.Seachを呼んでいる
+// 石の評価については、下記URLを参考にしています。
+// https://uguisu.skr.jp/othello/5-1.html
 //
-//
-// 作成日: 
-// 作成者: 
+// 作成日: 2024/4/9
+// 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
-using System.Collections;
 
 public class AITurnOver : MonoBehaviour
 {
 
     #region 変数  
 
-    [SerializeField,Header("読む手数")]
-    private int _depth = 2;
+    #region const定数
 
+    // 白の石の値
+    private const int WHITE_STONE_INDEX = -1;
+
+    // 黒の石の値
+    private const int BLACK_STONE_INDEX = 1;
+
+    // 1つ隣
+    private const int ONE_NEIGHBOR = 1;
+
+    // 2つ隣
+    private const int TWO_NEIGHBOR = 2;
+
+    // 盤面のマス数
+    private const int MASS_NUMBER = 8;
+
+    // 最大スコア初期値
+    private const int INITIAL_VALUE = -1000;
+
+    #endregion
+
+    // マスの評価値
     readonly private int[,] EVALUATION_VALUE = new int[,]
     {
         { 30,-12,  0, -1, -1,  0, -12,  30},
@@ -29,6 +51,10 @@ public class AITurnOver : MonoBehaviour
         { 30,-12,  0, -1, -1,  0, -12,  30},
     };
 
+    [SerializeField,Header("読む手数")]
+    private int _depth = 2;
+
+    // AISeach取得用
     private AISeach _AISeach = default;
 
     #endregion
@@ -40,20 +66,31 @@ public class AITurnOver : MonoBehaviour
     /// </summary>  
     private void Start ()
     {
+        // 初期設定
         _AISeach = this.gameObject.GetComponent<AISeach>();
     }
 
-    public int TurnOver(int[,] n, int x, int z, int myStoneColer,int turnStoneColer, int conut)
+    /// <summary>
+    /// 石を裏返す処理
+    /// </summary>
+    /// <param name="surfacePlate">盤面の配列</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    /// <param name="myStoneColer">AIの石の色</param>
+    /// <param name="turnStoneColer">ターン中の石の色</param>
+    /// <param name="conut">手数</param>
+    /// <returns>AIの合計スコア</returns>
+    public int TurnOver(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int myStoneColer,int turnStoneColer, int conut)
     {
         // コピー用の配列生成
-        int[,] copy = new int[8, 8];
+        int[,] copy = new int[MASS_NUMBER, MASS_NUMBER];
 
         // 現在の盤面をコピー
-        for (int i = 0; i < n.GetLength(0); i++)
+        for (int i = 0; i < surfacePlate.GetLength(0); i++)
         {
-            for (int j = 0; j < n.GetLength(1); j++)
+            for (int j = 0; j < surfacePlate.GetLength(1); j++)
             {
-                copy[i, j] = n[i, j];
+                copy[i, j] = surfacePlate[i, j];
             }
         }
         
@@ -61,381 +98,447 @@ public class AITurnOver : MonoBehaviour
         conut++;
 
         // 現在のマスが範囲内で右隣に石があるとき
-        if (z != n.GetLength(1) - 1 && n[x, z + 1] != turnStoneColer && n[x, z + 1] != 0)
+        if (horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis, horizontalAxis + ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis + ONE_NEIGHBOR] != 0)
         {
-            n = Seach1(copy, x, z, turnStoneColer);
-        }
-
-        // 現在のマスが範囲内で左隣に石があるとき
-        if (x != n.GetLength(0) - 1 && n[x + 1, z] != turnStoneColer && n[x + 1, z] != 0)
-        {
-            n = Seach2(copy, x, z, turnStoneColer);
-        }
-
-        // 現在のマスが範囲内で下に石があるとき
-        if (z != 0 && n[x, z - 1] != turnStoneColer && n[x, z - 1] != 0)
-        {
-            n = Seach3(copy, x, z, turnStoneColer);
+            surfacePlate = Seach1(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で上に石があるとき
-        if (x != 0 && n[x - 1, z] != turnStoneColer && n[x - 1, z] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - ONE_NEIGHBOR && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis] != 0)
         {
-            n = Seach4(copy, x, z, turnStoneColer);
+            surfacePlate = Seach2(copy, verticalAxis, horizontalAxis, turnStoneColer);
+        }
+
+        // 現在のマスが範囲内で左に石があるとき
+        if (horizontalAxis != 0 && surfacePlate[verticalAxis, horizontalAxis - ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis - ONE_NEIGHBOR] != 0)
+        {
+            surfacePlate = Seach3(copy, verticalAxis, horizontalAxis, turnStoneColer);
+        }
+
+        // 現在のマスが範囲内で下に石があるとき
+        if (verticalAxis != 0 && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis] != 0)
+        {
+            surfacePlate = Seach4(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左下に石があるとき
-        if (x != n.GetLength(0) - 1 && z != n.GetLength(1) - 1 && n[x + 1, z + 1] != turnStoneColer && n[x + 1, z + 1] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - ONE_NEIGHBOR && horizontalAxis != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis + 1] != 0)
         {
-            n = Seach5(copy, x, z, turnStoneColer);
+            surfacePlate = Seach5(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で右上に石があるとき
-        if (x != 0 && z != n.GetLength(1) - 1 && n[x - 1, z + 1] != turnStoneColer && n[x - 1, z + 1] != 0)
+        if (verticalAxis != 0 && horizontalAxis != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR] != 0)
         {
-            n = Seach6(copy, x, z, turnStoneColer);
+            surfacePlate = Seach6(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で右下に石があるとき
-        if (x != n.GetLength(0) - 1 && z != 0 && n[x + 1, z - 1] != turnStoneColer && n[x + 1, z - 1] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - ONE_NEIGHBOR && horizontalAxis != 0 && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != 0)
         {
-            n = Seach7(copy, x, z, turnStoneColer);
+            surfacePlate = Seach7(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左上に石があるとき
-        if (x != 0 && z != 0 && n[x - 1, z - 1] != turnStoneColer && n[x - 1, z - 1] != 0)
+        if (verticalAxis != 0 && horizontalAxis != 0 && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != 0)
         {
-            n = Seach8(copy, x, z, turnStoneColer);
+            surfacePlate = Seach8(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
-        n[x, z] = turnStoneColer;
+        // 石を置く
+        surfacePlate[verticalAxis, horizontalAxis] = turnStoneColer;
 
+        // 下の階層があるとき
         if (conut < _depth)
         {
-            return _AISeach.Seach(n, myStoneColer, -turnStoneColer,conut);
+            return _AISeach.Seach(surfacePlate, myStoneColer, -turnStoneColer,conut);
         }
+        // 一番下の階層のとき
         else
         {
-            return Score(n,turnStoneColer);
+            return Score(surfacePlate,turnStoneColer);
         }
     }
-
-
-    private int Score(int[,] n, int myStoneColer)
+    /// <summary>
+    /// スコアを求める処理
+    /// </summary>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="myStoneColer">自分の石の色</param>
+    /// <returns>スコア</returns>
+    private int Score(int[,] surfacePlate, int myStoneColer)
     {
-        int score = -1000;
+        // 初期設定
+
+        // スコア代入用
+        int score = INITIAL_VALUE;
+
+        // 白の石の合計スコア
         int whiteScore = 0;
+
+        // 黒の石の合計スコア
         int blackScore = 0;
-        for (int i = 0; i < n.GetLength(0); i++)
+
+        // スコア計算
+        for (int i = 0; i < surfacePlate.GetLength(0); i++)
         {
-            for(int j = 0; j < n.GetLength(1);j++)
+            for(int j = 0; j < surfacePlate.GetLength(1);j++)
             {
-                if(n[i,j] == -1)
+                // 白の石のとき
+                if(surfacePlate[i,j] == WHITE_STONE_INDEX)
                 {
                     whiteScore += EVALUATION_VALUE[i, j];
                 }
-                else if(n[i,j] == 1)
+                // 黒の石のとき
+                else if(surfacePlate[i,j] == BLACK_STONE_INDEX)
                 {
                     blackScore += EVALUATION_VALUE[i, j];
                 }
             }
         }
 
-        if(myStoneColer == -1)
+        // 自分の石が黒の石のとき
+        if(myStoneColer == BLACK_STONE_INDEX)
         {
             score = whiteScore - blackScore;
         }
-        else if (myStoneColer == 1)
+        // 自分の石が白の石のとき
+        else if (myStoneColer == WHITE_STONE_INDEX)
         {
             score = blackScore - whiteScore;
         }
+
+        // スコアを返す
         return score;
     }
 
     /// <summary>
     /// 右隣の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach1(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach1(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = z + 2; i < n.GetLength(1); i++)
+        for (int i = horizontalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
-            if (n[x, i] == 0)
+            if (surfacePlate[verticalAxis, i] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[x, i] == coler)
+            else if (surfacePlate[verticalAxis, i] == coler)
             {
-                a = i - z - 1;
+                a = i - horizontalAxis - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x, z + i] = -n[x, z + i];
+            // 盤面情報更新
+            surfacePlate[verticalAxis, horizontalAxis + i] = -surfacePlate[verticalAxis, horizontalAxis + i];
         }
-
-        return n;
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 左隣の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach2(int[,] c, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach2(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
         // 隣の色を見ていく
-        for (int i = x + 2; i < c.GetLength(1); i++)
+        for (int i = verticalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
-            if (c[i, z] == 0)
+            if (surfacePlate[i, horizontalAxis] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (c[i, z] == coler)
+            else if (surfacePlate[i, horizontalAxis] == coler)
             {
-                a = i - x - 1;
+                a = i - verticalAxis - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            c[x + i, z] = -c[x + i, z];
+            // 盤面情報更新
+            surfacePlate[verticalAxis + i, horizontalAxis] = -surfacePlate[verticalAxis + i, horizontalAxis];
         }
-        return c;
+
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach3(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach3(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = z - 2; i > 0; i--)
+        for (int i = horizontalAxis - TWO_NEIGHBOR; i > 0; i--)
         {
             // 何もなかったとき
-            if (n[x, i] == 0)
+            if (surfacePlate[verticalAxis, i] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[x, i] == coler)
+            else if (surfacePlate[verticalAxis, i] == coler)
             {
-                a = z - i - 1;
+                a = horizontalAxis - i - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x, z - i] = -n[x, z - i];
+            // 盤面情報更新
+            surfacePlate[verticalAxis, horizontalAxis - i] = -surfacePlate[verticalAxis, horizontalAxis - i];
         }
-        return n;
+
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach4(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach4(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = x - 2; i > 0; i--)
+        for (int i = verticalAxis - TWO_NEIGHBOR; i > 0; i--)
         {
             // 何もなかったとき
-            if (n[i, z] == 0)
+            if (surfacePlate[i, horizontalAxis] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[i, z] == coler)
+            else if (surfacePlate[i, horizontalAxis] == coler)
             {
-                a = x - i - 1;
+                a = verticalAxis - i - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x - i, z] = -n[x - i, z];
+            // 盤面情報更新
+            surfacePlate[verticalAxis - i, horizontalAxis] = -surfacePlate[verticalAxis - i, horizontalAxis];
         }
-        return n;
+
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 右下の探索
+    /// <param name="surfacePlate">盤面情報</param>
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach5(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach5(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = 2; i < n.GetLength(1); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
-            if (x + i >= n.GetLength(0) || z + i >= n.GetLength(1))
+            if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis + i >= surfacePlate.GetLength(1))
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x + i, z + i] == 0)
+            if (surfacePlate[verticalAxis + i, horizontalAxis + i] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[x + i, z + i] == coler)
+            else if (surfacePlate[verticalAxis + i, horizontalAxis + i] == coler)
             {
                 a = i - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x + i, z + i] = -n[x + i, z + i];
+            // 盤面情報更新
+            surfacePlate[verticalAxis + i, horizontalAxis + i] = -surfacePlate[verticalAxis + i, horizontalAxis + i];
         }
-        return n;
+
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 右上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach6(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach6(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = 2; i < n.GetLength(1); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
-            if (x - i < 0 || z + i >= n.GetLength(1))
+            if (verticalAxis - i < 0 || horizontalAxis + i >= surfacePlate.GetLength(1))
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x - i, z + i] == 0)
+            if (surfacePlate[verticalAxis - i, horizontalAxis + i] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[x - i, z + i] == coler)
+            else if (surfacePlate[verticalAxis - i, horizontalAxis + i] == coler)
             {
                 a = i - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x - i, z + i] = -n[x - i, z + i];
+            // 盤面情報更新
+            surfacePlate[verticalAxis - i, horizontalAxis + i] = -surfacePlate[verticalAxis - i, horizontalAxis + i];
         }
-        return n;
+
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 左下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach7(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach7(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = 2; i < n.GetLength(1); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
-            if (x + i >= n.GetLength(0) || z - i < 0)
+            if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis - i < 0)
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x + i, z - i] == 0)
+            if (surfacePlate[verticalAxis + i, horizontalAxis - i] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[x + i, z - i] == coler)
+            else if (surfacePlate[verticalAxis + i, horizontalAxis - i] == coler)
             {
                 a = i - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x + i, z - i] = -n[x + i, z - i];
+            // 盤面情報更新
+            surfacePlate[verticalAxis + i, horizontalAxis - i] = -surfacePlate[verticalAxis + i, horizontalAxis - i];
         }
 
-        return n;
+        // 盤面情報を返す
+        return surfacePlate;
     }
 
     /// <summary>
     /// 左上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
     /// <param name="coler">石の色</param>
-    private int[,] Seach8(int[,] n, int x, int z, int coler)
+    /// <returns>盤面情報</returns>
+    private int[,] Seach8(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = 2; i < n.GetLength(1); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
-            if (x - i < 0 || z - i < 0)
+            if (verticalAxis - i < 0 || horizontalAxis - i < 0)
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x - i, z - i] == 0)
+            if (surfacePlate[verticalAxis - i, horizontalAxis - i] == 0)
             {
                 break;
             }
             // 同じ色があったとき
-            else if (n[x - i, z - i] == coler)
+            else if (surfacePlate[verticalAxis - i, horizontalAxis - i] == coler)
             {
                 a = i - 1;
                 break;
             }
         }
 
+        // 石を裏返す
         for (int i = 1; i <= a; i++)
         {
-            n[x - i, z - i] = -n[x - i, z - i];
+            // 盤面情報更新
+            surfacePlate[verticalAxis - i, horizontalAxis - i] = -surfacePlate[verticalAxis - i, horizontalAxis - i];
         }
 
-        return n;
+        // 盤面情報を返す
+        return surfacePlate;
     }
     #endregion
 

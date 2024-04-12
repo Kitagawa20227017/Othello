@@ -1,13 +1,12 @@
 // ---------------------------------------------------------  
 // MyScript1.cs  
 // 
+// 盤面情報更新処理
 //
-//
-// 作成日: 
-// 作成者: 
+// 作成日: 2024/4/9
+// 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
-using System.Collections;
 
 public class AISeach : MonoBehaviour
 {
@@ -25,10 +24,22 @@ public class AISeach : MonoBehaviour
     // 盤面に置ける最大石数
     private const int STONE_MAX_SUM = 64;
 
+    // 1つ隣
+    private const int ONE_NEIGHBOR = 1;
+
+    // 2つ隣
+    private const int TWO_NEIGHBOR = 2;
+
+    // 盤面のマス数
+    private const int MASS_NUMBER = 8;
+
+    // 石が置ける
+    private const int PUT_STONE = 1;
+
     #endregion
 
-    private MyScript4 _myScript4 = default;
-
+    // BottomScore取得用
+    private BottomScore _bottomScore = default;
 
     #endregion
 
@@ -40,84 +51,84 @@ public class AISeach : MonoBehaviour
     private void Start()
     {
         // 初期設定
-        _myScript4 = this.gameObject.GetComponent<MyScript4>();
+        _bottomScore = this.gameObject.GetComponent<BottomScore>();
     }
 
     /// <summary>
     /// 探索処理
     /// </summary>
-    public int Seach(int[,] n, int myStoneColer, int turnStoneColer, int conut)
+    public int Seach(int[,] surfacePlate, int myStoneColer, int turnStoneColer, int conut)
     {
         // それぞれの石の置ける位置情報
-        int[,] whiteSurfacePlate = new int[8, 8];
-        int[,] blackSurfacePlate = new int[8, 8];
-         int _whiteStoneConut = 0;
-    int _blackStoneConut = 0;
-    int stoneConut = 0;
+        int[,] whiteSurfacePlate = new int[MASS_NUMBER, MASS_NUMBER];
+        int[,] blackSurfacePlate = new int[MASS_NUMBER, MASS_NUMBER];
+        int _whiteStoneConut = 0;
+        int _blackStoneConut = 0;
+        int stoneConut = 0;
         // 石が盤面全てに埋まっていたら終了
-        foreach (int tem in n)
+        foreach (int tem in surfacePlate)
         {
-            if (Mathf.Abs(tem) == 1)
+            if (Mathf.Abs(tem) == PUT_STONE)
             {
                 stoneConut++;
             }
         }
 
-        if (stoneConut >= 64)
+        if (stoneConut >= STONE_MAX_SUM)
         {
             return 0;
         }
 
-        for (int i = 0; i < n.GetLength(0); i++)
+        for (int i = 0; i < surfacePlate.GetLength(0); i++)
         {
-            for (int j = 0; j < n.GetLength(1); j++)
+            for (int j = 0; j < surfacePlate.GetLength(1); j++)
             {
                 // 現在のマスが範囲内で石が置いてなく右隣に石があるとき
-                if (j != n.GetLength(1) - 1 && n[i, j + 1] != 0 && n[i, j] == 0)
+                if (j != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[i, j + ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach1(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach1(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左隣に石があるとき
-                if (j != 0 && n[i, j - 1] != 0 && n[i, j] == 0)
+                if (j != 0 && surfacePlate[i, j - ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach2(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach2(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく下に石があるとき
-                if (i != n.GetLength(0) - 1 && n[i + 1, j] != 0 && n[i, j] == 0)
+                if (i != surfacePlate.GetLength(0) - ONE_NEIGHBOR && surfacePlate[i + ONE_NEIGHBOR, j] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach3(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach3(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく上に石があるとき
-                if (i != 0 && n[i - 1, j] != 0 && n[i, j] == 0)
+                if (i != 0 && surfacePlate[i - ONE_NEIGHBOR, j] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach4(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach4(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左下に石があるとき
-                if (i != n.GetLength(0) - 1 && j != n.GetLength(1) - 1 && n[i + 1, j + 1] != 0 && n[i, j] == 0)
+                if (i != surfacePlate.GetLength(0) - ONE_NEIGHBOR && j != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[i + ONE_NEIGHBOR, j + ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach5(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach5(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく右上に石があるとき
-                if (i != 0 && j != n.GetLength(1) - 1 && n[i - 1, j + 1] != 0 && n[i, j] == 0)
+                if (i != 0 && j != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[i - ONE_NEIGHBOR, j + ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach6(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach6(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく右下に石があるとき
-                if (i != n.GetLength(0) - 1 && j != 0 && n[i + 1, j - 1] != 0 && n[i, j] == 0)
+                if (i != surfacePlate.GetLength(0) - ONE_NEIGHBOR && j != 0 && surfacePlate[i + ONE_NEIGHBOR, j - ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach7(n, whiteSurfacePlate, blackSurfacePlate, i, j);
+                    Seach7(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左上に石があるとき
-                if (i != 0 && j != 0 && n[i - 1, j - 1] != 0 && n[i, j] == 0)
+                if (i != 0 && j != 0 && surfacePlate[i - ONE_NEIGHBOR, j - ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
                 {
-                    Seach8(n, whiteSurfacePlate,blackSurfacePlate, i, j);
+                    Seach8(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
             }
         }
@@ -133,23 +144,25 @@ public class AISeach : MonoBehaviour
         }
 
         // 白の置ける場所がないかつ白のターンのとき
-        if (_whiteStoneConut == 0 && turnStoneColer == -1)
+        if (_whiteStoneConut == 0 && turnStoneColer == WHITE_STONE_INDEX)
         {
             return 0;
         }
         // 黒の置ける場所がないかつ黒のターンのとき
-        else if (_blackStoneConut == 0 && turnStoneColer == 1)
+        else if (_blackStoneConut == 0 && turnStoneColer == BLACK_STONE_INDEX)
         {
             return 0;
         }
 
-        if (turnStoneColer == -1)
+        // 白のターンのとき
+        if (turnStoneColer == WHITE_STONE_INDEX)
         {
-            return _myScript4.lll(n, whiteSurfacePlate, myStoneColer, turnStoneColer, conut);
+            return _bottomScore.MaxScore(surfacePlate, blackSurfacePlate, myStoneColer, turnStoneColer, conut);
         }
+        // 黒のターンのとき
         else
         {
-            return _myScript4.lll(n, blackSurfacePlate, myStoneColer, turnStoneColer, conut);
+            return _bottomScore.MaxScore(surfacePlate, whiteSurfacePlate, myStoneColer, turnStoneColer, conut);
         }
 
     }
@@ -157,26 +170,29 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 右隣の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach1(int[,] n,int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach1(int[,] surfacePlate,int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 右隣の色を見る
-        int coler = n[x, z + 1];
+        int coler = surfacePlate[verticalAxis, horizontalAxis + ONE_NEIGHBOR];
 
         // 色を見た隣の色を見ていく
-        for (int i = z + 2; i < n.GetLength(1); i++)
+        for (int i = horizontalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
-            if (n[x, i] == 0)
+            if (surfacePlate[verticalAxis, i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[x, i] == -coler)
+            else if (surfacePlate[verticalAxis, i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -185,28 +201,29 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 左隣の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    ///
-    ///
-    private void Seach2(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach2(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 左隣の色を見る
-        int coler = n[x, z - 1];
+        int coler = surfacePlate[verticalAxis, horizontalAxis - ONE_NEIGHBOR];
 
         // 色を見た隣の色を見ていく
-        for (int i = z - 2; i > 0; i--)
+        for (int i = horizontalAxis - TWO_NEIGHBOR; i > 0; i--)
         {
             // 何もなかったとき
-            if (n[x, i] == 0)
+            if (surfacePlate[verticalAxis, i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[x, i] == -coler)
+            else if (surfacePlate[verticalAxis, i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -215,26 +232,29 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach3(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach3(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 下の色を見る
-        int coler = n[x + 1, z];
+        int coler = surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis];
 
         // 色を見た隣の色を見ていく
-        for (int i = x + 2; i < n.GetLength(0); i++)
+        for (int i = verticalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
         {
             // 何もなかったとき
-            if (n[i, z] == 0)
+            if (surfacePlate[i, horizontalAxis] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[i, z] == -coler)
+            else if (surfacePlate[i, horizontalAxis] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -243,26 +263,29 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach4(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach4(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 上の色を見る
-        int coler = n[x - 1, z];
+        int coler = surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis];
 
         // 色を見た隣の色を見ていく
-        for (int i = x - 2; i > 0; i++)
+        for (int i = verticalAxis - TWO_NEIGHBOR; i > 0; i--)
         {
             // 何もなかったとき
-            if (n[i, z] == 0)
+            if (surfacePlate[i, horizontalAxis] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[i, z] == -coler)
+            else if (surfacePlate[i, horizontalAxis] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -271,32 +294,35 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 左下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach5(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach5(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 左下の色を見る
-        int coler = n[x + 1, z + 1];
+        int coler = surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR];
 
         // 色を見た隣の色を見ていく
-        for (int i = 2; i < n.GetLength(0); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x + i >= n.GetLength(0) || z + i >= n.GetLength(1))
+            if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis + i >= surfacePlate.GetLength(1))
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x + i, z + i] == 0)
+            if (surfacePlate[verticalAxis + i, horizontalAxis + i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[x + i, z + i] == -coler)
+            else if (surfacePlate[verticalAxis + i, horizontalAxis + i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -305,32 +331,35 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 右上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach6(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach6(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 右上の色を見る
-        int coler = n[x - 1, z + 1];
+        int coler = surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR];
 
         // 色を見た隣の色を見ていく
-        for (int i = 2; i < n.GetLength(0); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x - i < 0 || z + i >= n.GetLength(1))
+            if (verticalAxis - i < 0 || horizontalAxis + i >= surfacePlate.GetLength(1))
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x - i, z + i] == 0)
+            if (surfacePlate[verticalAxis - i, horizontalAxis + i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[x - i, z + i] == -coler)
+            else if (surfacePlate[verticalAxis - i, horizontalAxis + i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -339,32 +368,35 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 右下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach7(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach7(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 右下の色を見る
-        int coler = n[x + 1, z - 1];
+        int coler = surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR];
 
         // 色を見た隣の色を見ていく
-        for (int i = 2; i < n.GetLength(0); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x + i >= n.GetLength(0) || z - i < 0)
+            if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis - i < 0)
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x + i, z - i] == 0)
+            if (surfacePlate[verticalAxis + i, horizontalAxis - i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[x + i, z - i] == -coler)
+            else if (surfacePlate[verticalAxis + i, horizontalAxis - i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate, coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -373,32 +405,35 @@ public class AISeach : MonoBehaviour
     /// <summary>
     /// 左下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach8(int[,] n, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int x, int z)
+    /// <param name="surfacePlate">盤面情報</param>
+    /// <param name="whiteSurfacePlate">白の置けるマスの格納</param>
+    /// <param name="blackSurfacePlate">黒の置けるマスの格納</param>
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach8(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 左下の色を見る
-        int coler = n[x - 1, z - 1];
+        int coler = surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR];
 
         // 色を見た隣の色を見ていく
-        for (int i = 2; i < n.GetLength(0); i++)
+        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x - i < 0 || z - i < 0)
+            if (verticalAxis - i < 0 || horizontalAxis - i < 0)
             {
                 break;
             }
 
             // 何もなかったとき
-            if (n[x - i, z - i] == 0)
+            if (surfacePlate[verticalAxis - i, horizontalAxis - i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (n[x - i, z - i] == -coler)
+            else if (surfacePlate[verticalAxis - i, horizontalAxis - i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(whiteSurfacePlate, blackSurfacePlate,coler, x, z);
+                PutStoneColer(whiteSurfacePlate, blackSurfacePlate,coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -415,12 +450,12 @@ public class AISeach : MonoBehaviour
         //  
         if (coler == BLACK_STONE_INDEX)
         {
-            blackSurfacePlate[x, z] = 1;
+            blackSurfacePlate[x, z] = PUT_STONE;
         }
         //
         else if (coler == WHITE_STONE_INDEX)
         {
-            whiteSurfacePlate[x, z] = 1;
+            whiteSurfacePlate[x, z] = PUT_STONE;
         }
     }
 

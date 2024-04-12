@@ -23,7 +23,7 @@ public class RandomAIAlgorithms : MonoBehaviour
 
     private GameManager _gameManagerScript = default;
     private SeachPutPossible _seachPutPossible = default;
-    private MyScript2 _turnOver = default;
+    private StoneControl _turnOver = default;
     private bool _isBlack = false;
     private int[,] _myPutStone = new int[8, 8];
 
@@ -48,7 +48,7 @@ public class RandomAIAlgorithms : MonoBehaviour
     {
         _gameManagerScript = _gameManager.GetComponent<GameManager>();
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
-        _turnOver = _putStone.GetComponent<MyScript2>();
+        _turnOver = _putStone.GetComponent<StoneControl>();
         if(_gameManagerScript.IsPlayerTurn == false)
         {
             _isBlack = true;

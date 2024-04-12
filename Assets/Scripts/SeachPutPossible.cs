@@ -156,6 +156,7 @@ public class SeachPutPossible : MonoBehaviour
             {
                 s = "引き分け";
             }
+            Debug.Log("白 :" + _whiteStoneSum + " 黒 : " +_blackStoneSum);
             _gameManagerScript.nnnn(s);
             isFin = true;
             return;
@@ -278,6 +279,8 @@ public class SeachPutPossible : MonoBehaviour
             }
         }
 
+        //Debug.Log(_whiteSurfacePlate[5, 4]);
+
         // 白の置ける場所がないかつ白のターンのとき
         if (_whiteStoneConut == 0 && !_gameManagerScript.IsTurn)
         {
@@ -355,6 +358,7 @@ public class SeachPutPossible : MonoBehaviour
     /// <param name="z">横軸</param>
     private void Seach3(int x, int z)
     {
+       // Debug.Log("A");
         // 下の色を見る
         int coler = _surfacePlate[x + 1, z];
 
@@ -387,7 +391,7 @@ public class SeachPutPossible : MonoBehaviour
         int coler = _surfacePlate[x - 1, z];
 
         // 色を見た隣の色を見ていく
-        for (int i = x - 2; i >= 0; i++)
+        for (int i = x - 2; i >= 0; i--)
         {
             // 何もなかったとき
             if (_surfacePlate[i, z] == 0)

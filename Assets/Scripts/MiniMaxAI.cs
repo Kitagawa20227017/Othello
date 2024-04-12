@@ -1,59 +1,105 @@
 // ---------------------------------------------------------  
-// MyScript.cs  
+// MiniMaxAI.cs  
 // 
+// MiniMax法によるAI
 //
-//
-// 作成日: 
-// 作成者: 
+// 作成日: 2024/4/9
+// 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
-using System.Collections;
 
 public class MiniMaxAI : MonoBehaviour
 {
 
     #region 変数  
 
-    [SerializeField]
+    #region const定数
+
+    // 白の石の値
+    private const int WHITE_STONE_INDEX = -1;
+
+    // 黒の石の値
+    private const int BLACK_STONE_INDEX = 1;
+
+    // 石が置ける
+    private const int PUT_STONE = 1;
+
+    #endregion
+
+    [SerializeField,Header("SurfacePlateオブジェクト")]
     private GameObject _surfacePlate = default;
 
-    [SerializeField]
+    [SerializeField, Header("GameManagerオブジェクト")]
     private GameObject _gameManager = default;
 
-    [SerializeField]
+    [SerializeField, Header("PutStoneオブジェクト")]
     private GameObject _putStone = default;
 
+    // GameManager取得用
     private GameManager _gameManagerScript = default;
+
+    // SeachPutPossible取得用
     private SeachPutPossible _seachPutPossible = default;
-    private MyScript2 _myScript = default;
-    private AITurnOver _myScript3 = default;
-    private bool _isWhite = false;
+
+    // StoneControl取得用
+    private StoneControl _stoneControl = default;
+
+    // AITurnOver取得用
+    private AITurnOver _AITurnOver = default;
+
+    // 盤面情報コピー用
     private int[,] _mapCopy = new int[8, 8];
+
+    // 石が置けるマスのコピー用
     private int[,] _myPutStone = new int[8, 8];
+
+    // 自分の石の色
     private int _myColer = 0;
+
+    // スコア代入用
+    private int _score = 0;
+
+    // 最大スコア代入用
+    private int _maxScore = default;
+
+    // 置く石の縦軸
+    private int _verticalAxis = 0;
+
+    // 置く石の横軸 
+    private int _horizontalAxis = 0;
+
+    // 置けるマスの数
+    private int _myPutConut = 0;
+
+    // 自分の石の色が白かどうか
+    private bool _isWhite = false;
+
+    // スコア更新フラグ
+    private bool _isUpdataScore = false;
 
     #endregion
 
     #region メソッド  
-     
+
     /// <summary>  
     /// 更新前処理  
     /// </summary>  
     private void Start ()
     {
+        // 初期設定
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
-        _myScript = _putStone.GetComponent<MyScript2>();
+        _stoneControl = _putStone.GetComponent<StoneControl>();
         _gameManagerScript = _gameManager.GetComponent<GameManager>();
-        _myScript3 = this.gameObject.GetComponent<AITurnOver>();
+        _AITurnOver = this.gameObject.GetComponent<AITurnOver>();
         if (_gameManagerScript.IsPlayerTurn == false)
         {
             _isWhite = true;
-            _myColer = 1;
+            _myColer = BLACK_STONE_INDEX;
         }
         else
         {
             _isWhite = false;
-            _myColer = -1;
+            _myColer = WHITE_STONE_INDEX;
         }
     }
 
@@ -62,8 +108,10 @@ public class MiniMaxAI : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (_gameManagerScript.IsPlayerTurn == false)
+        // 自分のターンが来たとき
+        if (_gameManagerScript.IsPlayerTurn == false && !_gameManagerScript.IsFin)
         {
+            // 盤面情報をコピー
             for(int i = 0; i < _mapCopy.GetLength(0); i++)
             {
                 for(int j = 0; j < _mapCopy.GetLength(1); j++)
@@ -71,18 +119,23 @@ public class MiniMaxAI : MonoBehaviour
                     _mapCopy[i, j] = _seachPutPossible.Map[i, j];
                 }
             }
+            // MinimMaxによる探索開始
             MiniMax();
         }
     }
 
-    public void MiniMax()
+    /// <summary>
+    /// MiniMaxによる探索
+    /// </summary>
+    private void MiniMax()
     {
-        int score = 0;
-        int maxScore = -10000;
-        int x = 0;
-        int z = 0;
-        int myPutConut = 0;
-        bool flag = false;
+        // 初期化
+        _score = 0;
+        _maxScore = -10000;
+        _verticalAxis = 0;
+        _horizontalAxis = 0;
+        _myPutConut = 0;
+        _isUpdataScore = false;
 
         // 自分が黒のとき
         if (!_isWhite)
@@ -93,7 +146,7 @@ public class MiniMaxAI : MonoBehaviour
                 for (int j = 0; j < _seachPutPossible.Black.GetLength(1); j++)
                 {
                     _myPutStone[i, j] = _seachPutPossible.Black[i, j];
-                    myPutConut = _seachPutPossible.BlackCount;
+                    _myPutConut = _seachPutPossible.BlackCount;
                 }
             }
         }
@@ -106,13 +159,13 @@ public class MiniMaxAI : MonoBehaviour
                 for (int j = 0; j < _seachPutPossible.White.GetLength(1); j++)
                 {
                     _myPutStone[i, j] = _seachPutPossible.White[i, j];
-                    myPutConut = _seachPutPossible.WhiteCount;
+                    _myPutConut = _seachPutPossible.WhiteCount;
                 }
             }
         }
 
         // 置ける場所がなかったらスキップ
-        if(myPutConut == 0)
+        if(_myPutConut == 0)
         {
             return;
         }
@@ -123,29 +176,39 @@ public class MiniMaxAI : MonoBehaviour
             for (int j = 0; j < _myPutStone.GetLength(0); j++)
             {
                 // 石が置けるとき
-                if (_myPutStone[i, j] == 1)
+                if (_myPutStone[i, j] == PUT_STONE)
                 {
                     // スコアを計算する
-                    score = _myScript3.TurnOver(_mapCopy,i,j,_myColer, _myColer, 0);
-                    flag = true;
+                    _score = -_AITurnOver.TurnOver(_mapCopy,i,j,_myColer, _myColer, 0);
+                    _isUpdataScore = true;
                 }
 
                 // 新しいスコアが最大スコアより大きいとき
-                if (flag && score > maxScore)
+                if (_isUpdataScore && _score > _maxScore)
                 {
                     // 最大スコアの更新
-                    maxScore = score;
+                    _maxScore = _score;
 
                     // 最大スコアのマスの記録
-                    x = i;
-                    z = j;
+                    _verticalAxis = i;
+                    _horizontalAxis = j;
                 }
-                flag = false;
+                // 最大スコアが同じのとき
+                else if(_isUpdataScore && _score == _maxScore && Random.Range(0,2) == 0)
+                {
+                    // 最大スコアの更新
+                    _maxScore = _score;
+
+                    // 最大スコアのマスの記録
+                    _verticalAxis = i;
+                    _horizontalAxis = j;
+                }
+                _isUpdataScore = false;
             }
         }
 
         // 最大スコアのマスを渡す
-        _myScript.aaa(x, z);
+        _stoneControl.aaa(_verticalAxis, _horizontalAxis);
         return;
 
     }
