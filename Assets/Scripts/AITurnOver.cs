@@ -16,19 +16,13 @@ public class AITurnOver : MonoBehaviour
 
     #region 変数  
 
-    #region const定数
+    #region 定数
 
     // 白の石の値
     private const int WHITE_STONE_INDEX = -1;
 
     // 黒の石の値
     private const int BLACK_STONE_INDEX = 1;
-
-    // 1つ隣
-    private const int ONE_NEIGHBOR = 1;
-
-    // 2つ隣
-    private const int TWO_NEIGHBOR = 2;
 
     // 盤面のマス数
     private const int MASS_NUMBER = 8;
@@ -41,14 +35,14 @@ public class AITurnOver : MonoBehaviour
     // マスの評価値
     readonly private int[,] EVALUATION_VALUE = new int[,]
     {
-        { 30,-12,  0, -1, -1,  0, -12,  30},
+        { 40,-12,  0, -1, -1,  0, -12,  40},
         {-12,-15, -3, -3, -3, -3, -15, -12},
         {  0, -3,  0, -1, -1,  0,  -3,   0},
         { -1, -3, -1, -1, -1, -1,  -3,  -1},
         { -1, -3, -1, -1, -1, -1,  -3,  -1},
         {  0, -3,  0, -1, -1,  0,  -3,   0},
         {-12,-15, -3, -3, -3, -3, -15, -12},
-        { 30,-12,  0, -1, -1,  0, -12,  30},
+        { 40,-12,  0, -1, -1,  0, -12,  40},
     };
 
     [SerializeField,Header("読む手数")]
@@ -98,49 +92,49 @@ public class AITurnOver : MonoBehaviour
         conut++;
 
         // 現在のマスが範囲内で右隣に石があるとき
-        if (horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis, horizontalAxis + ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis + ONE_NEIGHBOR] != 0)
+        if (horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis, horizontalAxis + 1] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis + 1] != 0)
         {
             surfacePlate = Seach1(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で上に石があるとき
-        if (verticalAxis != surfacePlate.GetLength(0) - ONE_NEIGHBOR && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - 1 && surfacePlate[verticalAxis + 1, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis] != 0)
         {
             surfacePlate = Seach2(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左に石があるとき
-        if (horizontalAxis != 0 && surfacePlate[verticalAxis, horizontalAxis - ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis - ONE_NEIGHBOR] != 0)
+        if (horizontalAxis != 0 && surfacePlate[verticalAxis, horizontalAxis - 1] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis - 1] != 0)
         {
             surfacePlate = Seach3(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で下に石があるとき
-        if (verticalAxis != 0 && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis] != 0)
+        if (verticalAxis != 0 && surfacePlate[verticalAxis - 1, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis - 1, horizontalAxis] != 0)
         {
             surfacePlate = Seach4(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左下に石があるとき
-        if (verticalAxis != surfacePlate.GetLength(0) - ONE_NEIGHBOR && horizontalAxis != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis + 1] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - 1 && horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis + 1, horizontalAxis + 1] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis + 1] != 0)
         {
             surfacePlate = Seach5(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で右上に石があるとき
-        if (verticalAxis != 0 && horizontalAxis != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR] != 0)
+        if (verticalAxis != 0 && horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis - 1, horizontalAxis + 1] != turnStoneColer && surfacePlate[verticalAxis - 1, horizontalAxis + 1] != 0)
         {
             surfacePlate = Seach6(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で右下に石があるとき
-        if (verticalAxis != surfacePlate.GetLength(0) - ONE_NEIGHBOR && horizontalAxis != 0 && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - 1 && horizontalAxis != 0 && surfacePlate[verticalAxis + 1, horizontalAxis - 1] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis - 1] != 0)
         {
             surfacePlate = Seach7(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左上に石があるとき
-        if (verticalAxis != 0 && horizontalAxis != 0 && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != turnStoneColer && surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR] != 0)
+        if (verticalAxis != 0 && horizontalAxis != 0 && surfacePlate[verticalAxis - 1, horizontalAxis - 1] != turnStoneColer && surfacePlate[verticalAxis - 1, horizontalAxis - 1] != 0)
         {
             surfacePlate = Seach8(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
@@ -224,7 +218,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = horizontalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = horizontalAxis + 2; i < surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
             if (surfacePlate[verticalAxis, i] == 0)
@@ -261,7 +255,7 @@ public class AITurnOver : MonoBehaviour
     {
         int a = default;
         // 隣の色を見ていく
-        for (int i = verticalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = verticalAxis + 2; i < surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
             if (surfacePlate[i, horizontalAxis] == 0)
@@ -300,7 +294,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = horizontalAxis - TWO_NEIGHBOR; i > 0; i--)
+        for (int i = horizontalAxis - 2; i > 0; i--)
         {
             // 何もなかったとき
             if (surfacePlate[verticalAxis, i] == 0)
@@ -339,7 +333,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = verticalAxis - TWO_NEIGHBOR; i > 0; i--)
+        for (int i = verticalAxis - 2; i > 0; i--)
         {
             // 何もなかったとき
             if (surfacePlate[i, horizontalAxis] == 0)
@@ -378,7 +372,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = 2; i < surfacePlate.GetLength(1); i++)
         {
             if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis + i >= surfacePlate.GetLength(1))
             {
@@ -422,7 +416,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = 2; i < surfacePlate.GetLength(1); i++)
         {
             if (verticalAxis - i < 0 || horizontalAxis + i >= surfacePlate.GetLength(1))
             {
@@ -466,7 +460,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = 2; i < surfacePlate.GetLength(1); i++)
         {
             if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis - i < 0)
             {
@@ -510,7 +504,7 @@ public class AITurnOver : MonoBehaviour
         int a = default;
 
         // 隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = 2; i < surfacePlate.GetLength(1); i++)
         {
             if (verticalAxis - i < 0 || horizontalAxis - i < 0)
             {

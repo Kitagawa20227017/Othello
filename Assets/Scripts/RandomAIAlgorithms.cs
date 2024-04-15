@@ -108,7 +108,7 @@ public class RandomAIAlgorithms : MonoBehaviour
 
                 if(putStoneConut == randomMass)
                 {
-                    _turnOver.aaa(i, j);
+                    _turnOver.PutStone(i, j);
                     return;
                 }
             }

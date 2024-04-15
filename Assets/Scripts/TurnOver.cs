@@ -53,49 +53,52 @@ public class TurnOver : MonoBehaviour
     public void Seach(int x, int z,int stoneColer)
     {
         // 現在のマスが範囲内で右隣に石があるとき
-        if (z != _seachPutPossible.Map.GetLength(1) - 1 &&_seachPutPossible.Map[x, z + 1] != stoneColer && _seachPutPossible.Map[x, z + 1] != 0)
+        if (z != _seachPutPossible.Map.GetLength(1) - 1 && -_seachPutPossible.Map[x, z + 1] == stoneColer )/*_seachPutPossible.Map[x, z + 1] != stoneColer && _seachPutPossible.Map[x, z + 1] != 0)*/
         {
             Seach1(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で左隣に石があるとき
-        if (x != _seachPutPossible.Map.GetLength(0) - 1 && _seachPutPossible.Map[x + 1, z] != stoneColer && _seachPutPossible.Map[x + 1, z] != 0)
+        if (x != _seachPutPossible.Map.GetLength(0) - 1 && -_seachPutPossible.Map[x + 1, z] == stoneColer/* && _seachPutPossible.Map[x + 1, z] != 0*/)
         {
             Seach2(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で下に石があるとき
-        if (z != 0 && _seachPutPossible.Map[x, z - 1] != stoneColer && _seachPutPossible.Map[x, z - 1] != 0)
+        if (z != 0 && -_seachPutPossible.Map[x, z - 1] == stoneColer /*&& _seachPutPossible.Map[x, z - 1] != 0*/)
         {
             Seach3(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で上に石があるとき
-        if (x != 0 && _seachPutPossible.Map[x - 1, z] != stoneColer && _seachPutPossible.Map[x - 1, z] != 0)
+        if (x != 0 && -_seachPutPossible.Map[x - 1, z] == stoneColer /*&& _seachPutPossible.Map[x - 1, z] != 0*/)
         {
             Seach4(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で左下に石があるとき
-        if (x != _seachPutPossible.Map.GetLength(0) - 1 && z != _seachPutPossible.Map.GetLength(1) - 1 && _seachPutPossible.Map[x + 1, z + 1] != stoneColer && _seachPutPossible.Map[x + 1, z + 1] != 0)
+        if (x != _seachPutPossible.Map.GetLength(0) - 1 && z != _seachPutPossible.Map.GetLength(1) - 1 && 
+            -_seachPutPossible.Map[x + 1, z + 1] == stoneColer /*&& _seachPutPossible.Map[x + 1, z + 1] != 0*/)
         {
             Seach5(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で右上に石があるとき
-        if (x != 0 && z != _seachPutPossible.Map.GetLength(1) - 1 && _seachPutPossible.Map[x - 1, z + 1] != stoneColer && _seachPutPossible.Map[x - 1, z + 1] != 0)
+        if (x != 0 && z != _seachPutPossible.Map.GetLength(1) - 1 && 
+            -_seachPutPossible.Map[x - 1, z + 1] == stoneColer /*&& _seachPutPossible.Map[x - 1, z + 1] != 0*/)
         {
             Seach6(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で右下に石があるとき
-        if (x != _seachPutPossible.Map.GetLength(0) - 1 && z != 0 && _seachPutPossible.Map[x + 1, z - 1] != stoneColer && _seachPutPossible.Map[x + 1, z - 1] != 0)
+        if (x != _seachPutPossible.Map.GetLength(0) - 1 && z != 0 && 
+            -_seachPutPossible.Map[x + 1, z - 1] == stoneColer /*&& _seachPutPossible.Map[x + 1, z - 1] != 0*/)
         {
             Seach7(x, z, stoneColer);
         }
 
         // 現在のマスが範囲内で左上に石があるとき
-        if (x != 0 && z != 0 && _seachPutPossible.Map[x - 1, z - 1] != stoneColer && _seachPutPossible.Map[x - 1, z - 1] != 0)
+        if (x != 0 && z != 0 && -_seachPutPossible.Map[x - 1, z - 1] == stoneColer /*&& _seachPutPossible.Map[x - 1, z - 1] != 0*/)
         {
             Seach8(x, z, stoneColer);
         }
