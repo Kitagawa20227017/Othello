@@ -13,7 +13,7 @@ public class SeachPutPossible : MonoBehaviour
 
     #region 変数  
 
-    #region const定数
+    #region 定数
 
     // 白の石の向き
     private const int WHITE_STONE_ANGLE = 270;
@@ -26,6 +26,9 @@ public class SeachPutPossible : MonoBehaviour
 
     // 黒の石の値
     private const int BLACK_STONE_INDEX = 1;
+
+    // 石が置ける
+    private const int PUT_STONE = 1;
 
     // 盤面に置ける最大石数
     private const int STONE_MAX_SUM = 64;
@@ -60,16 +63,13 @@ public class SeachPutPossible : MonoBehaviour
     private int _whiteStoneSum = 0;
     private int _blackStoneSum = 0;
 
+    // 終了フラグ
     private bool isFin = false;
 
     #endregion
 
     #region プロパティ  
 
-    public bool IsFin
-    {
-        get => isFin;
-    }
     public int[,] Map
     {
         get => _surfacePlate;
@@ -138,6 +138,7 @@ public class SeachPutPossible : MonoBehaviour
 
             }
 
+            // 置けるマスのオブジェクトを非アクティブ化
             foreach(Transform chlid in _putStoneTransform)
             {
                 chlid.gameObject.SetActive(false);
@@ -165,6 +166,8 @@ public class SeachPutPossible : MonoBehaviour
         // 初期化
         _whiteStoneConut = 0;
         _blackStoneConut = 0;
+
+        // 初期化
         for (int i = 0; i < _blackSurfacePlate.GetLength(0);i++)
         {
             for(int j = 0; j < _blackSurfacePlate.GetLength(1);j++)
@@ -215,6 +218,7 @@ public class SeachPutPossible : MonoBehaviour
             }
         }
 
+        // 探索
         for (int i = 0; i < _surfacePlate.GetLength(0); i++)
         {
             for (int j = 0; j < _surfacePlate.GetLength(1); j++)
@@ -244,7 +248,7 @@ public class SeachPutPossible : MonoBehaviour
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左下に石があるとき
-                if (i != _surfacePlate.GetLength(0) - 1 && j != _surfacePlate.GetLength(1) - 1 && _surfacePlate[i + 1, j + 1] != 0 && _surfacePlate[i, j] == 0)
+                if (i != _surfacePlate.GetLength(0) - 1 && j != _surfacePlate.GetLength(1) - 1 &&  _surfacePlate[i + 1, j + 1] != 0 && _surfacePlate[i, j] == 0)
                 {
                     Seach5(i, j);
                 }
@@ -279,8 +283,6 @@ public class SeachPutPossible : MonoBehaviour
             }
         }
 
-        //Debug.Log(_whiteSurfacePlate[5, 4]);
-
         // 白の置ける場所がないかつ白のターンのとき
         if (_whiteStoneConut == 0 && !_gameManagerScript.IsTurn)
         {
@@ -298,26 +300,26 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 右隣の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach1(int x,int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach1(int verticalAxis,int horizontalAxis)
     {
         // 右隣の色を見る
-        int coler = _surfacePlate[x, z +1];
+        int coler = _surfacePlate[verticalAxis, horizontalAxis + 1];
 
         // 色を見た隣の色を見ていく
-        for(int i = z + 2; i < _surfacePlate.GetLength(1); i++)
+        for(int i = horizontalAxis + 2; i < _surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
-            if(_surfacePlate[x,i] == 0)
+            if(_surfacePlate[verticalAxis,i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[x, i] == -coler)
+            else if (_surfacePlate[verticalAxis, i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -326,26 +328,26 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 左隣の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach2(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach2(int verticalAxis, int horizontalAxis)
     {
         // 左隣の色を見る
-        int coler = _surfacePlate[x, z - 1];
+        int coler = _surfacePlate[verticalAxis, horizontalAxis - 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = z - 2; i >= 0; i--)
+        for (int i = horizontalAxis - 2; i >= 0; i--)
         {
             // 何もなかったとき
-            if (_surfacePlate[x, i] == 0)
+            if (_surfacePlate[verticalAxis, i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[x, i] == -coler)
+            else if (_surfacePlate[verticalAxis, i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -354,27 +356,26 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach3(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach3(int verticalAxis, int horizontalAxis)
     {
-       // Debug.Log("A");
         // 下の色を見る
-        int coler = _surfacePlate[x + 1, z];
+        int coler = _surfacePlate[verticalAxis + 1, horizontalAxis];
 
         // 色を見た隣の色を見ていく
-        for (int i = x + 2; i < _surfacePlate.GetLength(0); i++)
+        for (int i = verticalAxis + 2; i < _surfacePlate.GetLength(0); i++)
         {
             // 何もなかったとき
-            if (_surfacePlate[i, z] == 0)
+            if (_surfacePlate[i, horizontalAxis] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[i, z] == -coler)
+            else if (_surfacePlate[i, horizontalAxis] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -383,26 +384,26 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach4(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach4(int verticalAxis, int horizontalAxis)
     {
         // 上の色を見る
-        int coler = _surfacePlate[x - 1, z];
+        int coler = _surfacePlate[verticalAxis - 1, horizontalAxis];
 
         // 色を見た隣の色を見ていく
-        for (int i = x - 2; i >= 0; i--)
+        for (int i = verticalAxis - 2; i >= 0; i--)
         {
             // 何もなかったとき
-            if (_surfacePlate[i, z] == 0)
+            if (_surfacePlate[i, horizontalAxis] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[i, z] == -coler)
+            else if (_surfacePlate[i, horizontalAxis] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -411,32 +412,32 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 左下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach5(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach5(int verticalAxis, int horizontalAxis)
     {
         // 左下の色を見る
-        int coler = _surfacePlate[x + 1, z + 1];
+        int coler = _surfacePlate[verticalAxis + 1, horizontalAxis + 1];
 
         // 色を見た隣の色を見ていく
         for (int i = 2; i < _surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if(x + i >= _surfacePlate.GetLength(0) || z + i >= _surfacePlate.GetLength(1))
+            if(verticalAxis + i >= _surfacePlate.GetLength(0) || horizontalAxis + i >= _surfacePlate.GetLength(1))
             {
                 break;
             }
 
             // 何もなかったとき
-            if (_surfacePlate[x + i,z + i] == 0)
+            if (_surfacePlate[verticalAxis + i,horizontalAxis + i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[x + i, z + i] == -coler)
+            else if (_surfacePlate[verticalAxis + i, horizontalAxis + i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -445,32 +446,32 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 右上の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach6(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach6(int verticalAxis, int horizontalAxis)
     {
         // 右上の色を見る
-        int coler = _surfacePlate[x - 1, z + 1];
+        int coler = _surfacePlate[verticalAxis - 1, horizontalAxis + 1];
 
         // 色を見た隣の色を見ていく
         for (int i = 2; i < _surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x - i < 0 || z + i >= _surfacePlate.GetLength(1))
+            if (verticalAxis - i < 0 || horizontalAxis + i >= _surfacePlate.GetLength(1))
             {
                 break;
             }
 
             // 何もなかったとき
-            if (_surfacePlate[x - i, z + i] == 0)
+            if (_surfacePlate[verticalAxis - i, horizontalAxis + i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[x - i, z + i] == -coler)
+            else if (_surfacePlate[verticalAxis - i, horizontalAxis + i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -479,32 +480,32 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 右下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach7(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach7(int verticalAxis, int horizontalAxis)
     {
         // 右下の色を見る
-        int coler = _surfacePlate[x + 1, z - 1];
+        int coler = _surfacePlate[verticalAxis + 1, horizontalAxis - 1];
 
         // 色を見た隣の色を見ていく
         for (int i = 2; i < _surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x + i >= _surfacePlate.GetLength(0) || z - i < 0)
+            if (verticalAxis + i >= _surfacePlate.GetLength(0) || horizontalAxis - i < 0)
             {
                 break;
             }
 
             // 何もなかったとき
-            if (_surfacePlate[x + i, z - i] == 0)
+            if (_surfacePlate[verticalAxis + i, horizontalAxis - i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[x + i, z - i] == -coler)
+            else if (_surfacePlate[verticalAxis + i, horizontalAxis - i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -513,32 +514,32 @@ public class SeachPutPossible : MonoBehaviour
     /// <summary>
     /// 左下の探索
     /// </summary>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void Seach8(int x, int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void Seach8(int verticalAxis, int horizontalAxis)
     {
         // 左下の色を見る
-        int coler = _surfacePlate[x - 1, z - 1];
+        int coler = _surfacePlate[verticalAxis - 1, horizontalAxis - 1];
 
         // 色を見た隣の色を見ていく
         for (int i = 2; i < _surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
-            if (x - i < 0 || z - i < 0)
+            if (verticalAxis - i < 0 || horizontalAxis - i < 0)
             {
                 break;
             }
 
             // 何もなかったとき
-            if (_surfacePlate[x - i, z - i] == 0)
+            if (_surfacePlate[verticalAxis - i, horizontalAxis - i] == 0)
             {
                 break;
             }
             // 別の色(白なら黒、黒なら白)があったとき
-            else if (_surfacePlate[x - i, z - i] == -coler)
+            else if (_surfacePlate[verticalAxis - i, horizontalAxis - i] == -coler)
             {
                 // 位置と色を渡す
-                PutStoneColer(coler, x, z);
+                PutStoneColer(coler, verticalAxis, horizontalAxis);
                 break;
             }
         }
@@ -548,19 +549,19 @@ public class SeachPutPossible : MonoBehaviour
     /// 置ける色の判定
     /// </summary>
     /// <param name="coler">石の色</param>
-    /// <param name="x">縦軸</param>
-    /// <param name="z">横軸</param>
-    private void PutStoneColer(int coler,int x,int z)
+    /// <param name="verticalAxis">縦軸</param>
+    /// <param name="horizontalAxis">横軸</param>
+    private void PutStoneColer(int coler,int verticalAxis,int horizontalAxis)
     {
         //  
         if(coler == BLACK_STONE_INDEX)
         {
-            _blackSurfacePlate[x, z] = 1;
+            _blackSurfacePlate[verticalAxis, horizontalAxis] = 1;
         }
         //
         else if(coler == WHITE_STONE_INDEX)
         {
-            _whiteSurfacePlate[x, z] = 1;
+            _whiteSurfacePlate[verticalAxis, horizontalAxis] = 1;
         }
     }
 

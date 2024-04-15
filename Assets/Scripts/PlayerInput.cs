@@ -45,7 +45,7 @@ public class PlayerInput : MonoBehaviour
             RaycastHit hit = new RaycastHit();
             if (Physics.Raycast(ray, out hit) && hit.collider.tag == "OK")
             {
-                _myScript.aaa(Mathf.FloorToInt(hit.collider.transform.localPosition.x), Mathf.FloorToInt(hit.collider.transform.localPosition.z));
+                _myScript.PutStone(Mathf.FloorToInt(hit.collider.transform.localPosition.x), Mathf.FloorToInt(hit.collider.transform.localPosition.z));
             }
         }
     }

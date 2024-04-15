@@ -56,7 +56,6 @@ public class GameManager : MonoBehaviour
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
         _myScript = _putStone.GetComponent<StoneControl>();
         int preceding = Random.Range(0, 2);
-        //preceding = 0;
         if (preceding == 0)
         {
             _isPlayerTurn = false;

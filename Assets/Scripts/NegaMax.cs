@@ -1,19 +1,19 @@
 // ---------------------------------------------------------  
 // MiniMaxAI.cs  
 // 
-// MiniMax法によるAI
+// NegaMax法によるAI
 //
 // 作成日: 2024/4/9
 // 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
 
-public class MiniMaxAI : MonoBehaviour
+public class NegaMax : MonoBehaviour
 {
 
     #region 変数  
 
-    #region const定数
+    #region 定数
 
     // 白の石の値
     private const int WHITE_STONE_INDEX = -1;
@@ -120,14 +120,14 @@ public class MiniMaxAI : MonoBehaviour
                 }
             }
             // MinimMaxによる探索開始
-            MiniMax();
+            NegaMaxAI();
         }
     }
 
     /// <summary>
-    /// MiniMaxによる探索
+    /// NegaMaxによる探索
     /// </summary>
-    private void MiniMax()
+    private void NegaMaxAI()
     {
         // 初期化
         _score = 0;
@@ -193,7 +193,7 @@ public class MiniMaxAI : MonoBehaviour
                     _verticalAxis = i;
                     _horizontalAxis = j;
                 }
-                // 最大スコアが同じのとき
+                // 最大スコアが同じのときはランダムで位置を決める
                 else if(_isUpdataScore && _score == _maxScore && Random.Range(0,2) == 0)
                 {
                     // 最大スコアの更新
@@ -208,7 +208,7 @@ public class MiniMaxAI : MonoBehaviour
         }
 
         // 最大スコアのマスを渡す
-        _stoneControl.aaa(_verticalAxis, _horizontalAxis);
+        _stoneControl.PutStone(_verticalAxis, _horizontalAxis);
         return;
 
     }

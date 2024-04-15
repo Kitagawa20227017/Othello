@@ -13,7 +13,7 @@ public class AISeach : MonoBehaviour
 
     #region 変数  
 
-    #region const定数
+    #region 定数
 
     // 白の石の値
     private const int WHITE_STONE_INDEX = -1;
@@ -23,12 +23,6 @@ public class AISeach : MonoBehaviour
 
     // 盤面に置ける最大石数
     private const int STONE_MAX_SUM = 64;
-
-    // 1つ隣
-    private const int ONE_NEIGHBOR = 1;
-
-    // 2つ隣
-    private const int TWO_NEIGHBOR = 2;
 
     // 盤面のマス数
     private const int MASS_NUMBER = 8;
@@ -84,49 +78,49 @@ public class AISeach : MonoBehaviour
             for (int j = 0; j < surfacePlate.GetLength(1); j++)
             {
                 // 現在のマスが範囲内で石が置いてなく右隣に石があるとき
-                if (j != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[i, j + ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
+                if (j != surfacePlate.GetLength(1) - 1 && surfacePlate[i, j + 1] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach1(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左隣に石があるとき
-                if (j != 0 && surfacePlate[i, j - ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
+                if (j != 0 && surfacePlate[i, j - 1] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach2(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく下に石があるとき
-                if (i != surfacePlate.GetLength(0) - ONE_NEIGHBOR && surfacePlate[i + ONE_NEIGHBOR, j] != 0 && surfacePlate[i, j] == 0)
+                if (i != surfacePlate.GetLength(0) - 1 && surfacePlate[i + 1, j] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach3(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく上に石があるとき
-                if (i != 0 && surfacePlate[i - ONE_NEIGHBOR, j] != 0 && surfacePlate[i, j] == 0)
+                if (i != 0 && surfacePlate[i - 1, j] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach4(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左下に石があるとき
-                if (i != surfacePlate.GetLength(0) - ONE_NEIGHBOR && j != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[i + ONE_NEIGHBOR, j + ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
+                if (i != surfacePlate.GetLength(0) - 1 && j != surfacePlate.GetLength(1) - 1 && surfacePlate[i + 1, j + 1] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach5(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく右上に石があるとき
-                if (i != 0 && j != surfacePlate.GetLength(1) - ONE_NEIGHBOR && surfacePlate[i - ONE_NEIGHBOR, j + ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
+                if (i != 0 && j != surfacePlate.GetLength(1) - 1 && surfacePlate[i - 1, j + 1] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach6(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく右下に石があるとき
-                if (i != surfacePlate.GetLength(0) - ONE_NEIGHBOR && j != 0 && surfacePlate[i + ONE_NEIGHBOR, j - ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
+                if (i != surfacePlate.GetLength(0) - 1 && j != 0 && surfacePlate[i + 1, j - 1] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach7(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
 
                 // 現在のマスが範囲内で石が置いてなく左上に石があるとき
-                if (i != 0 && j != 0 && surfacePlate[i - ONE_NEIGHBOR, j - ONE_NEIGHBOR] != 0 && surfacePlate[i, j] == 0)
+                if (i != 0 && j != 0 && surfacePlate[i - 1, j - 1] != 0 && surfacePlate[i, j] == 0)
                 {
                     Seach8(surfacePlate, whiteSurfacePlate, blackSurfacePlate, i, j);
                 }
@@ -178,10 +172,10 @@ public class AISeach : MonoBehaviour
     private void Seach1(int[,] surfacePlate,int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 右隣の色を見る
-        int coler = surfacePlate[verticalAxis, horizontalAxis + ONE_NEIGHBOR];
+        int coler = surfacePlate[verticalAxis, horizontalAxis + 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = horizontalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(1); i++)
+        for (int i = horizontalAxis + 2; i < surfacePlate.GetLength(1); i++)
         {
             // 何もなかったとき
             if (surfacePlate[verticalAxis, i] == 0)
@@ -209,10 +203,10 @@ public class AISeach : MonoBehaviour
     private void Seach2(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 左隣の色を見る
-        int coler = surfacePlate[verticalAxis, horizontalAxis - ONE_NEIGHBOR];
+        int coler = surfacePlate[verticalAxis, horizontalAxis - 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = horizontalAxis - TWO_NEIGHBOR; i > 0; i--)
+        for (int i = horizontalAxis - 2; i > 0; i--)
         {
             // 何もなかったとき
             if (surfacePlate[verticalAxis, i] == 0)
@@ -240,10 +234,10 @@ public class AISeach : MonoBehaviour
     private void Seach3(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 下の色を見る
-        int coler = surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis];
+        int coler = surfacePlate[verticalAxis + 1, horizontalAxis];
 
         // 色を見た隣の色を見ていく
-        for (int i = verticalAxis + TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
+        for (int i = verticalAxis + 2; i < surfacePlate.GetLength(0); i++)
         {
             // 何もなかったとき
             if (surfacePlate[i, horizontalAxis] == 0)
@@ -271,10 +265,10 @@ public class AISeach : MonoBehaviour
     private void Seach4(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 上の色を見る
-        int coler = surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis];
+        int coler = surfacePlate[verticalAxis - 1, horizontalAxis];
 
         // 色を見た隣の色を見ていく
-        for (int i = verticalAxis - TWO_NEIGHBOR; i > 0; i--)
+        for (int i = verticalAxis - 2; i > 0; i--)
         {
             // 何もなかったとき
             if (surfacePlate[i, horizontalAxis] == 0)
@@ -302,10 +296,10 @@ public class AISeach : MonoBehaviour
     private void Seach5(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 左下の色を見る
-        int coler = surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR];
+        int coler = surfacePlate[verticalAxis + 1, horizontalAxis + 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
+        for (int i = 2; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
             if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis + i >= surfacePlate.GetLength(1))
@@ -339,10 +333,10 @@ public class AISeach : MonoBehaviour
     private void Seach6(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 右上の色を見る
-        int coler = surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis + ONE_NEIGHBOR];
+        int coler = surfacePlate[verticalAxis - 1, horizontalAxis + 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
+        for (int i = 2; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
             if (verticalAxis - i < 0 || horizontalAxis + i >= surfacePlate.GetLength(1))
@@ -376,10 +370,10 @@ public class AISeach : MonoBehaviour
     private void Seach7(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 右下の色を見る
-        int coler = surfacePlate[verticalAxis + ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR];
+        int coler = surfacePlate[verticalAxis + 1, horizontalAxis - 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
+        for (int i = 2; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
             if (verticalAxis + i >= surfacePlate.GetLength(0) || horizontalAxis - i < 0)
@@ -413,10 +407,10 @@ public class AISeach : MonoBehaviour
     private void Seach8(int[,] surfacePlate, int[,] whiteSurfacePlate, int[,] blackSurfacePlate, int verticalAxis, int horizontalAxis)
     {
         // 左下の色を見る
-        int coler = surfacePlate[verticalAxis - ONE_NEIGHBOR, horizontalAxis - ONE_NEIGHBOR];
+        int coler = surfacePlate[verticalAxis - 1, horizontalAxis - 1];
 
         // 色を見た隣の色を見ていく
-        for (int i = TWO_NEIGHBOR; i < surfacePlate.GetLength(0); i++)
+        for (int i = 2; i < surfacePlate.GetLength(0); i++)
         {
             // 範囲外なら探索をやめる
             if (verticalAxis - i < 0 || horizontalAxis - i < 0)
