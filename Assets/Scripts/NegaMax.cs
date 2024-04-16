@@ -78,7 +78,7 @@ public class NegaMax : MonoBehaviour
     private bool _isUpdataScore = false;
 
     #endregion
-
+ 
     #region メソッド  
 
     /// <summary>  

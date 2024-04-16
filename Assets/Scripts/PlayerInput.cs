@@ -1,10 +1,10 @@
 // ---------------------------------------------------------  
 // PlayerInput.cs  
 //   
-// プレイヤー入力１
+// プレイヤー入力
 //
-// 作成日:  
-// 作成者:  
+// 作成日: 2024/4/2
+// 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
 using System.Collections;
@@ -17,11 +17,9 @@ public class PlayerInput : MonoBehaviour
     [SerializeField]
     private GameObject _putObj;
 
-    private StoneControl _myScript = default;
+    // stoneControl取得用
+    private StoneControl _stoneControl = default;
 
-    #endregion
-
-    #region プロパティ  
     #endregion
 
     #region メソッド  
@@ -31,7 +29,8 @@ public class PlayerInput : MonoBehaviour
     /// </summary>  
     private void Start ()
     {
-        _myScript = _putObj.GetComponent<StoneControl>();
+        // 初期設定
+        _stoneControl = _putObj.GetComponent<StoneControl>();
     }
 
     /// <summary>  
@@ -39,13 +38,20 @@ public class PlayerInput : MonoBehaviour
     /// </summary>  
     private void Update()
     {
+        // マウスでクリックしたとき
         if (Input.GetMouseButtonDown(0))
         {
+            // Rayを飛ばす
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            // クリックしたオブジェクトを取得
             RaycastHit hit = new RaycastHit();
+
+            // クリックしたオブジェクトがあって石が置けるとき
             if (Physics.Raycast(ray, out hit) && hit.collider.tag == "OK")
             {
-                _myScript.PutStone(Mathf.FloorToInt(hit.collider.transform.localPosition.x), Mathf.FloorToInt(hit.collider.transform.localPosition.z));
+                // マスの座標を渡す
+                _stoneControl.PutStone(Mathf.FloorToInt(hit.collider.transform.localPosition.x), Mathf.FloorToInt(hit.collider.transform.localPosition.z));
             }
         }
     }

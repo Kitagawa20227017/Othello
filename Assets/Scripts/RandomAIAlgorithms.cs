@@ -1,8 +1,10 @@
 // ---------------------------------------------------------  
-// MyScript1.cs  
+// RandomAIAlgorithms.cs
+// 
+// ランダムAIの処理
 //   
-// 作成日:  
-// 作成者:  
+// 作成日: 2024/4/11
+// 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
 using System.Collections;
@@ -12,40 +14,40 @@ public class RandomAIAlgorithms : MonoBehaviour
 
     #region 変数  
 
-    [SerializeField]
+    [SerializeField,Header("SurfacePlateオブジェクト")]
     private GameObject _surfacePlate = default;
 
-    [SerializeField]
+    [SerializeField, Header("gameManagerオブジェクト")]
     private GameObject _gameManager = default;
 
-    [SerializeField]
+    [SerializeField, Header("PutStoneオブジェクト")]
     private GameObject _putStone = default;
 
+    // GameManager取得用
     private GameManager _gameManagerScript = default;
+
+    // SeachPutPossible取得用
     private SeachPutPossible _seachPutPossible = default;
+
+    // StoneControl取得用
     private StoneControl _turnOver = default;
+
+    // 自分が黒かどうか
     private bool _isBlack = false;
+
+    // 自分が置けるマス
     private int[,] _myPutStone = new int[8, 8];
 
     #endregion
 
-    #region プロパティ  
-    #endregion
-
     #region メソッド  
-
-    /// <summary>  
-    /// 初期化処理  
-    /// </summary>  
-    private void Awake()
-    {
-    }
      
     /// <summary>  
     /// 更新前処理  
     /// </summary>  
     private void Start ()
     {
+        // 初期設定
         _gameManagerScript = _gameManager.GetComponent<GameManager>();
         _seachPutPossible = _surfacePlate.GetComponent<SeachPutPossible>();
         _turnOver = _putStone.GetComponent<StoneControl>();
@@ -64,19 +66,31 @@ public class RandomAIAlgorithms : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        // 自分のターンのとき
         if(_gameManagerScript.IsPlayerTurn == false)
         {
             RandomAI();
         }
     }
 
+    /// <summary>
+    /// ランダムAI処理
+    /// </summary>
     public void RandomAI()
     {
+        // ランダムに選ぶマス
         int randomMass = 0;
+
+        // 置けるマスの数
         int putStoneConut = 0;
+
+        // 自分が白のとき
         if (!_isBlack)
         {
+            // マスを選ぶ
             randomMass = Random.Range(1,_seachPutPossible.BlackCount + 1);
+
+            // 置けるマスえおコピー
             for(int i = 0; i < _seachPutPossible.Black.GetLength(0); i++)
             {
                 for(int j = 0; j < _seachPutPossible.Black.GetLength(1); j++)
@@ -85,9 +99,13 @@ public class RandomAIAlgorithms : MonoBehaviour
                 }
             }
         }
+        // 自分が白のとき
         else
         {
+            // マスを選ぶ
             randomMass = Random.Range(1, _seachPutPossible.WhiteCount + 1);
+
+            // 置けるマスえおコピー
             for (int i = 0; i < _seachPutPossible.White.GetLength(0); i++)
             {
                 for (int j = 0; j < _seachPutPossible.White.GetLength(1); j++)
@@ -97,15 +115,18 @@ public class RandomAIAlgorithms : MonoBehaviour
             }
         }
 
+        // 置くマスを探す
         for (int i = 0; i < _myPutStone.GetLength(0); i++)
         {
             for (int j = 0; j < _myPutStone.GetLength(0); j++)
             {
+                // 置けるマスのとき
                 if(_myPutStone[i,j] == 1)
                 {
                     putStoneConut++;
                 }
 
+                // 置くマスがあったとき
                 if(putStoneConut == randomMass)
                 {
                     _turnOver.PutStone(i, j);

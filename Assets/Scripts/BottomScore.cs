@@ -1,5 +1,5 @@
 // ---------------------------------------------------------  
-// MyScript4.cs  
+// BottomScore.cs  
 // 
 // 一番下の階層のスコアを求める処理
 //
@@ -41,11 +41,14 @@ public class BottomScore : MonoBehaviour
     {
         // 初期設定
 
+        // スコアの初期値
+        const int SCORE_INITIAL = -10000;
+
         // スコア代入用
         int score = 0;
 
         // 小さい値を代入しておく 
-        int maxScore = -10000;
+        int maxScore = SCORE_INITIAL;
         
         //　スコア更新フラグ
         bool isUpdateScore = false;

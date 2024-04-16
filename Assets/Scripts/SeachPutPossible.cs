@@ -64,7 +64,7 @@ public class SeachPutPossible : MonoBehaviour
     private int _blackStoneSum = 0;
 
     // 終了フラグ
-    private bool isFin = false;
+    private bool _isFin = false;
 
     #endregion
 
@@ -116,50 +116,8 @@ public class SeachPutPossible : MonoBehaviour
     /// </summary>
     public void Seach()
     {
-        if (isFin)
+        if (_isFin)
         {
-            return;
-        }
-
-        // 石が盤面全てに埋まっていたら終了
-        if (_parentTransform.childCount >= STONE_MAX_SUM)
-        {
-            // それぞれの石が何個か数える
-            foreach(int stone in _surfacePlate)
-            {
-                if(stone == BLACK_STONE_INDEX)
-                {
-                    _blackStoneSum++;
-                }
-                else if(stone == WHITE_STONE_INDEX)
-                {
-                    _whiteStoneSum++;
-                }
-
-            }
-
-            // 置けるマスのオブジェクトを非アクティブ化
-            foreach(Transform chlid in _putStoneTransform)
-            {
-                chlid.gameObject.SetActive(false);
-            }
-
-            string s = default;
-            if (_blackStoneSum > _whiteStoneSum)
-            {
-                s = "黒勝ち";
-            }
-            else if (_blackStoneSum < _whiteStoneSum)
-            {
-                s = "白勝ち";
-            }
-            else if (_blackStoneSum == _whiteStoneSum)
-            {
-                s = "引き分け";
-            }
-            Debug.Log("白 :" + _whiteStoneSum + " 黒 : " +_blackStoneSum);
-            _gameManagerScript.nnnn(s);
-            isFin = true;
             return;
         }
 
@@ -283,16 +241,57 @@ public class SeachPutPossible : MonoBehaviour
             }
         }
 
+
+        if (_parentTransform.childCount >= STONE_MAX_SUM)
+        {
+            // それぞれの石が何個か数える
+            foreach (int stone in _surfacePlate)
+            {
+                if (stone == BLACK_STONE_INDEX)
+                {
+                    _blackStoneSum++;
+                }
+                else if (stone == WHITE_STONE_INDEX)
+                {
+                    _whiteStoneSum++;
+                }
+
+            }
+
+            // 置けるマスのオブジェクトを非アクティブ化
+            foreach (Transform chlid in _putStoneTransform)
+            {
+                chlid.gameObject.SetActive(false);
+            }
+
+            int outCome = 0;
+            if (_blackStoneSum > _whiteStoneSum)
+            {
+                outCome = 1;
+            }
+            else if (_blackStoneSum < _whiteStoneSum)
+            {
+                outCome = - 1;
+            }
+            else if (_blackStoneSum == _whiteStoneSum)
+            {
+                outCome = 0;
+            }
+            _gameManagerScript.GameEnd(outCome);
+            _isFin = true;
+            return;
+        }
+
         // 白の置ける場所がないかつ白のターンのとき
         if (_whiteStoneConut == 0 && !_gameManagerScript.IsTurn)
         {
-            _gameManagerScript.aa();
+            _gameManagerScript.TurnChange();
             return;
         }
         // 黒の置ける場所がないかつ黒のターンのとき
         else if (_blackStoneConut == 0 && _gameManagerScript.IsTurn)
         {
-            _gameManagerScript.aa();
+            _gameManagerScript.TurnChange();
             return;
         }
     }
