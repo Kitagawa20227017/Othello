@@ -1,13 +1,12 @@
 // ---------------------------------------------------------  
 // StoneControl.cs  
 //   
-// 設置
+// 石の管理
 //
 // 作成日: 2024/4/10
 // 作成者: 北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
-using System.Collections;
 
 public class StoneControl : MonoBehaviour
 {
@@ -30,12 +29,6 @@ public class StoneControl : MonoBehaviour
 
     // 石が置けるマス
     private const int PUT_STONE = 1;
-
-    // 1つ隣
-    private const int ONE_NEIGHBOR = 1;
-
-    // 2つ隣
-    private const int TWO_NEIGHBOR = 2;
 
     #endregion
 

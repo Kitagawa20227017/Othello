@@ -28,9 +28,6 @@ public class TurnOver : MonoBehaviour
 
     #endregion
 
-    #region プロパティ  
-    #endregion
-
     #region メソッド  
 
     /// <summary>  
@@ -104,7 +101,7 @@ public class TurnOver : MonoBehaviour
         }
 
         // ターン終了
-        _gameManagerScript.aa();
+        _gameManagerScript.TurnChange();
 
     }
 

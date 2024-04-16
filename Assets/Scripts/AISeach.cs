@@ -1,5 +1,5 @@
 // ---------------------------------------------------------  
-// MyScript1.cs  
+// AISeach.cs  
 // 
 // 盤面情報更新処理
 //
@@ -68,11 +68,13 @@ public class AISeach : MonoBehaviour
             }
         }
 
+        // 石が埋まっているとき
         if (stoneConut >= STONE_MAX_SUM)
         {
             return 0;
         }
 
+        // 石の探索
         for (int i = 0; i < surfacePlate.GetLength(0); i++)
         {
             for (int j = 0; j < surfacePlate.GetLength(1); j++)
