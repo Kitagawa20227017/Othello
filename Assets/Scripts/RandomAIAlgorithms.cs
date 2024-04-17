@@ -90,7 +90,7 @@ public class RandomAIAlgorithms : MonoBehaviour
             // マスを選ぶ
             randomMass = Random.Range(1,_seachPutPossible.BlackCount + 1);
 
-            // 置けるマスえおコピー
+            // 置けるマスをコピー
             for(int i = 0; i < _seachPutPossible.Black.GetLength(0); i++)
             {
                 for(int j = 0; j < _seachPutPossible.Black.GetLength(1); j++)

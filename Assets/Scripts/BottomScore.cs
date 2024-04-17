@@ -14,7 +14,7 @@ public class BottomScore : MonoBehaviour
     #region 変数  
 
     // AITurnOver取得用
-    private AITurnOver _myScript = default;
+    private AITurnOver _AITurnOver = default;
 
     #endregion
 
@@ -25,7 +25,8 @@ public class BottomScore : MonoBehaviour
     /// </summary>  
     private void Start ()
     {
-        _myScript = this.gameObject.GetComponent<AITurnOver>();
+        // 初期設定
+        _AITurnOver = this.gameObject.GetComponent<AITurnOver>();
     }
 
     /// <summary>
@@ -65,7 +66,7 @@ public class BottomScore : MonoBehaviour
                     isUpdateScore = true;
 
                     // スコア代入
-                    score = -_myScript.TurnOver(surfacePlate, i, j, myStoneColer, turnStoneColer, conut);
+                    score = -_AITurnOver.TurnOver(surfacePlate, i, j, myStoneColer, turnStoneColer, conut);
                 }
 
                 // スコアが更新されて最大スコアよりも大きいとき

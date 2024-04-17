@@ -116,6 +116,7 @@ public class SeachPutPossible : MonoBehaviour
     /// </summary>
     public void Seach()
     {
+        // ゲームが終わったとき
         if (_isFin)
         {
             return;
@@ -174,6 +175,46 @@ public class SeachPutPossible : MonoBehaviour
                     _surfacePlate[verticalAxis, horizontalAxis] = WHITE_STONE_INDEX;
                     break;
             }
+        }
+
+        // どっちかの石がもうないかを調べる
+        foreach (int stone in _surfacePlate)
+        {
+            if (stone == BLACK_STONE_INDEX)
+            {
+                _blackStoneSum++;
+            }
+            else if (stone == WHITE_STONE_INDEX)
+            {
+                _whiteStoneSum++;
+            }
+        }
+
+        // どっちかの石がないとき
+        if(_blackStoneSum == 0 || _whiteStoneSum == 0)
+        {
+            // 置けるマスのオブジェクトを非アクティブ化
+            foreach (Transform chlid in _putStoneTransform)
+            {
+                chlid.gameObject.SetActive(false);
+            }
+
+            int outCome = 0;
+            if (_blackStoneSum > _whiteStoneSum)
+            {
+                outCome = 1;
+            }
+            else if (_blackStoneSum < _whiteStoneSum)
+            {
+                outCome = -1;
+            }
+            else if (_blackStoneSum == _whiteStoneSum)
+            {
+                outCome = 0;
+            }
+            _gameManagerScript.GameEnd(outCome);
+            _isFin = true;
+            return;
         }
 
         // 探索
@@ -241,6 +282,9 @@ public class SeachPutPossible : MonoBehaviour
             }
         }
 
+        // 初期化
+        _whiteStoneSum = 0;
+        _blackStoneSum = 0;
 
         if (_parentTransform.childCount >= STONE_MAX_SUM)
         {

@@ -35,14 +35,14 @@ public class AITurnOver : MonoBehaviour
     // マスの評価値
     readonly private int[,] EVALUATION_VALUE = new int[,]
     {
-        { 40,-12,  0, -1, -1,  0, -12,  40},
+        { 30,-12,  0, -1, -1,  0, -12,  30},
         {-12,-15, -3, -3, -3, -3, -15, -12},
         {  0, -3,  0, -1, -1,  0,  -3,   0},
         { -1, -3, -1, -1, -1, -1,  -3,  -1},
         { -1, -3, -1, -1, -1, -1,  -3,  -1},
         {  0, -3,  0, -1, -1,  0,  -3,   0},
         {-12,-15, -3, -3, -3, -3, -15, -12},
-        { 40,-12,  0, -1, -1,  0, -12,  40},
+        { 30,-12,  0, -1, -1,  0, -12,  30},
     };
 
     [SerializeField,Header("読む手数")]
@@ -92,49 +92,49 @@ public class AITurnOver : MonoBehaviour
         conut++;
 
         // 現在のマスが範囲内で右隣に石があるとき
-        if (horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis, horizontalAxis + 1] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis + 1] != 0)
+        if (horizontalAxis != surfacePlate.GetLength(1) - 1 && -surfacePlate[verticalAxis, horizontalAxis + 1] == turnStoneColer)
         {
             surfacePlate = Seach1(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で上に石があるとき
-        if (verticalAxis != surfacePlate.GetLength(0) - 1 && surfacePlate[verticalAxis + 1, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - 1 && -surfacePlate[verticalAxis + 1, horizontalAxis] == turnStoneColer)
         {
             surfacePlate = Seach2(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左に石があるとき
-        if (horizontalAxis != 0 && surfacePlate[verticalAxis, horizontalAxis - 1] != turnStoneColer && surfacePlate[verticalAxis, horizontalAxis - 1] != 0)
+        if (horizontalAxis != 0 && -surfacePlate[verticalAxis, horizontalAxis - 1] == turnStoneColer)
         {
             surfacePlate = Seach3(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で下に石があるとき
-        if (verticalAxis != 0 && surfacePlate[verticalAxis - 1, horizontalAxis] != turnStoneColer && surfacePlate[verticalAxis - 1, horizontalAxis] != 0)
+        if (verticalAxis != 0 && -surfacePlate[verticalAxis - 1, horizontalAxis] == turnStoneColer)
         {
             surfacePlate = Seach4(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左下に石があるとき
-        if (verticalAxis != surfacePlate.GetLength(0) - 1 && horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis + 1, horizontalAxis + 1] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis + 1] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - 1 && horizontalAxis != surfacePlate.GetLength(1) - 1 && -surfacePlate[verticalAxis + 1, horizontalAxis + 1] == turnStoneColer)
         {
             surfacePlate = Seach5(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で右上に石があるとき
-        if (verticalAxis != 0 && horizontalAxis != surfacePlate.GetLength(1) - 1 && surfacePlate[verticalAxis - 1, horizontalAxis + 1] != turnStoneColer && surfacePlate[verticalAxis - 1, horizontalAxis + 1] != 0)
+        if (verticalAxis != 0 && horizontalAxis != surfacePlate.GetLength(1) - 1 && -surfacePlate[verticalAxis - 1, horizontalAxis + 1] == turnStoneColer)
         {
             surfacePlate = Seach6(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で右下に石があるとき
-        if (verticalAxis != surfacePlate.GetLength(0) - 1 && horizontalAxis != 0 && surfacePlate[verticalAxis + 1, horizontalAxis - 1] != turnStoneColer && surfacePlate[verticalAxis + 1, horizontalAxis - 1] != 0)
+        if (verticalAxis != surfacePlate.GetLength(0) - 1 && horizontalAxis != 0 && -surfacePlate[verticalAxis + 1, horizontalAxis - 1] == turnStoneColer)
         {
             surfacePlate = Seach7(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
 
         // 現在のマスが範囲内で左上に石があるとき
-        if (verticalAxis != 0 && horizontalAxis != 0 && surfacePlate[verticalAxis - 1, horizontalAxis - 1] != turnStoneColer && surfacePlate[verticalAxis - 1, horizontalAxis - 1] != 0)
+        if (verticalAxis != 0 && horizontalAxis != 0 && -surfacePlate[verticalAxis - 1, horizontalAxis - 1] == turnStoneColer)
         {
             surfacePlate = Seach8(copy, verticalAxis, horizontalAxis, turnStoneColer);
         }
@@ -162,7 +162,6 @@ public class AITurnOver : MonoBehaviour
     private int Score(int[,] surfacePlate, int myStoneColer)
     {
         // 初期設定
-
         // スコア代入用
         int score = INITIAL_VALUE;
 
@@ -215,7 +214,8 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach1(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = horizontalAxis + 2; i < surfacePlate.GetLength(1); i++)
@@ -228,13 +228,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[verticalAxis, i] == coler)
             {
-                a = i - horizontalAxis - 1;
+                turnOverConut = i - horizontalAxis - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis, horizontalAxis + i] = -surfacePlate[verticalAxis, horizontalAxis + i];
@@ -253,7 +253,9 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach2(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
+
         // 隣の色を見ていく
         for (int i = verticalAxis + 2; i < surfacePlate.GetLength(1); i++)
         {
@@ -265,13 +267,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[i, horizontalAxis] == coler)
             {
-                a = i - verticalAxis - 1;
+                turnOverConut = i - verticalAxis - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis + i, horizontalAxis] = -surfacePlate[verticalAxis + i, horizontalAxis];
@@ -291,7 +293,8 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach3(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = horizontalAxis - 2; i > 0; i--)
@@ -304,13 +307,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[verticalAxis, i] == coler)
             {
-                a = horizontalAxis - i - 1;
+                turnOverConut = horizontalAxis - i - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis, horizontalAxis - i] = -surfacePlate[verticalAxis, horizontalAxis - i];
@@ -330,7 +333,7 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach4(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = verticalAxis - 2; i > 0; i--)
@@ -343,13 +346,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[i, horizontalAxis] == coler)
             {
-                a = verticalAxis - i - 1;
+                turnOverConut = verticalAxis - i - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis - i, horizontalAxis] = -surfacePlate[verticalAxis - i, horizontalAxis];
@@ -369,7 +372,8 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach5(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = 2; i < surfacePlate.GetLength(1); i++)
@@ -387,13 +391,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[verticalAxis + i, horizontalAxis + i] == coler)
             {
-                a = i - 1;
+                turnOverConut = i - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis + i, horizontalAxis + i] = -surfacePlate[verticalAxis + i, horizontalAxis + i];
@@ -413,7 +417,8 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach6(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = 2; i < surfacePlate.GetLength(1); i++)
@@ -431,13 +436,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[verticalAxis - i, horizontalAxis + i] == coler)
             {
-                a = i - 1;
+                turnOverConut = i - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis - i, horizontalAxis + i] = -surfacePlate[verticalAxis - i, horizontalAxis + i];
@@ -457,7 +462,8 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach7(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = 2; i < surfacePlate.GetLength(1); i++)
@@ -475,13 +481,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[verticalAxis + i, horizontalAxis - i] == coler)
             {
-                a = i - 1;
+                turnOverConut = i - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis + i, horizontalAxis - i] = -surfacePlate[verticalAxis + i, horizontalAxis - i];
@@ -501,7 +507,8 @@ public class AITurnOver : MonoBehaviour
     /// <returns>盤面情報</returns>
     private int[,] Seach8(int[,] surfacePlate, int verticalAxis, int horizontalAxis, int coler)
     {
-        int a = default;
+        // 裏返す枚数
+        int turnOverConut = default;
 
         // 隣の色を見ていく
         for (int i = 2; i < surfacePlate.GetLength(1); i++)
@@ -519,13 +526,13 @@ public class AITurnOver : MonoBehaviour
             // 同じ色があったとき
             else if (surfacePlate[verticalAxis - i, horizontalAxis - i] == coler)
             {
-                a = i - 1;
+                turnOverConut = i - 1;
                 break;
             }
         }
 
         // 石を裏返す
-        for (int i = 1; i <= a; i++)
+        for (int i = 1; i <= turnOverConut; i++)
         {
             // 盤面情報更新
             surfacePlate[verticalAxis - i, horizontalAxis - i] = -surfacePlate[verticalAxis - i, horizontalAxis - i];
